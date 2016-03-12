@@ -1,0 +1,15 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 Cochin;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\fi360\sl288\slmult1\pardirnatural
+
+\f0\fs28 \cf0 Functionality grows, because that\'92s what functionality does, and we\'92re asked about distinct visitors.\
+\
+That is, of all the different visitors we get, we have various IDs, and we want to know how many different visitors we saw in some selection of the traffic.\
+\
+How can we create that report?  Well, one way is to use a Set.  That is we can fold our visitors over a Set.  What do we need to do that? \
+\
+We need an empty value, and a way to combine values.  Which we\'92ve seen already.  We\'92d implement a monoid for sets, using union.\
+\
+It\'92s a one line change in the report.\
+}

@@ -1,0 +1,337 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 Cochin;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\fi360\sl288\slmult1\pardirnatural
+
+\f0\fs28 \cf0 Overall, I think you need a hook for the talk. Focus the content around a single point more, with more consistency between examples. I've written a proposal for an alternate opening that'd give you an alternate spin but let you re-use a bunch of examples. See the bottom of this document.\
+\
+-----\
+\
+1:20\
+\
+Scala being complex is fair.\
+There are too many damned features.\
+The answer is to *not* use all the features.\
+Choose a sane subset (or let us choose it for you).\
+\
+Or better still, don't talk about simplicity/complexity.\
+\
+5:15\
+\
+"We think" means "Underscore thinks".\
+Do you need to make that clarification?\
+\
+Also, if you're only going to talk about two points,\
+this list might be extraneous.\
+\
+Also, type classes are an exceptional example\
+of types working for you. You should mention them.\
+\
+6:30\
+\
+Show of hands. Who knows these terms? Audiences like interaction.\
+\
+7:15\
+\
+Agreed with Miles -- avoid "mumbo jumbo".\
+(I also didn't realise it had offensive undertones.)\
+\
+~8:00\
+\
+Describe what "sealed" and "final" do the first time you use them.\
+\
+10:00\
+\
+Coming back to the general thrust of the talk, I think the key point in all of this is that\
+defining the types of data we're using up-front allows\
+the compiler to do all sorts of crazy stuff for us.\
+\
+- Example 1 -- check exhaustivity of our pattern match;\
+- Example 2 -- summon type class instances;\
+- Example 3 -- shapeless magic woot!\
+\
+18:00\
+\
+That code looks super confusing if you don't know Scala syntax.\
+Do it with round parens instead:\
+\
+for(v <- List(1, 2, 3))\
+  a = addition.combine(a, v)\
+\
+I'd just use built-in foldLeft in this example.\
+People will understand it. Start with:\
+\
+  List(1, 2, 3).foldLeft(0)((a, b) => a + b)\
+\
+then go "we can write the same thing using our monoid":\
+\
+  List(1, 2, 3).foldLeft(addition.zero)(addition.combine)\
+\
+Then go "why do this?" and continue from 21:00 onwards.\
+\
+23:00\
+\
+It feels like your teetering on the edge of diving into this stuff. I'd get in and out faster (I assume you don't want to talk about it).\
+\
+"If we're building a set of all users for a large web site, we could very well run out of memory. Fortunately there are specialist data structures like HyperLogLog, that will give us an *approximate* user count and consume a relatively small, fixed amount of memory. The point here is that HyperLogLog sets are also monoids: we have everything we need with two operations: zero and combine."\
+\
+25:00\
+\
+IIRC you haven't mentioned string concatenation before... or at least in a while.\
+\
+29:00\
+\
+I think the laws will confuse people. Skip 'em.\
+\
+32:00\
+\
+(Note: I'm coming back to this now on Monday morning after our chat at the Skiff.)\
+\
+Can you maybe use CSV serialization as the running example to use to replace JSON writing? It's a "writer" style thing with monoidal combinators? Actually I think it's applicative, not monoidal ((F[A] F[B]) => F[(A, B)] instead of (A, A) => A) so maybe not. Dang.\
+\
+34:00\
+\
+Sized is a fairly complex example. Could you build the CSV library in section 2 in such a way that you can't get missing headers, and then re-use it in section 3?\
+\
+36:00\
+\
+The Circe partial updaters are an alternative to this... defined here:\
+https://github.com/finagle/finch/blob/master/docs/best-practices.md#picking-a-json-library\
+\
+37:30\
+\
+The LoC in Bulletin is debatable. Without line wrapping it's, like, 35 lines of code... but some of them are REALLY LONG lines.\
+\
+38:30\
+\
+It's debatable whether you want this level of information (about HLists) in there. You can simply hand-wave this and say "the compiler can split User and UserUpdate into parts, check the types and field names, and make sure they all match up".\
+\
+43:00\
+\
+If you drop the focus on simplicity, some of your closing material will unfortunately have to go. But the stuff on Typelevel is still relevant.\
+\
+===== ALTERNATE OPENING =====\
+\
+- Types Working For You\
+    - Part 0 - Introduction\
+        - This talk is about types\
+            - It's specifically about types in Scala\
+            - It's more specifically about why types in Scala are so\
+              freakin' cool, and why Scala developers get so excited\
+              about them when everyone else sees them as a hinderance\
+        - So what is a type?\
+            - This intro to Typescript sums up a typical viewpoint:\
+                - function greeter(person: string) \{\
+                      return "Hello, " + person;\
+                  \}\
+\
+                  var user = "Jane User";\
+\
+                  document.body.innerHTML = greeter(user);\
+                    - A lot of people see types as error messages,\
+                      designed to frustrate as much as to keep safe\
+                      (picture of frustrated programmer)\
+        - Seems like an unnecessary check, right?\
+        - After all, what's so bad about this?\
+            - document.body.innerHTML = greeter(12345);\
+            - So we call the user by their primary key. Minor\
+              information leak. Big deal. Why all the fuss?\
+        - What about this?\
+            - function shouldServeAlcohol(age) \{\
+                  if(person.age > 18) \{\
+                      return false;\
+                  \} else \{\
+                      return true;\
+                  \}\
+              \}\
+\
+              serveAlcohol("17");\
+        - It'll return true! We'll serve this person alcohol before\
+          we're supposed to!\
+        - Is this a bad mistake to make? Probably. Depends on your\
+          viewpoint (i.e. are you the 17-year-old in question).\
+        - What about this?\
+            - function shouldLaunchNukes(sure) \{\
+                  if(sure) // etc ...\
+              \}\
+\
+              shouldLaunchNukes("false");\
+        - (TODO: Example of writing a type definition as a line of\
+          comment above every function.)\
+        - In his famous talk "Simple Made Easy", Rich Hickey criticises\
+          both types and unit tests by comparing them to guardrails\
+          along a road:\
+            - "Who drives their car around banging against the\
+              guardrail saying, 'Whoa! I'm glad I've got these\
+              guardrails because I'd never make it to the show on\
+              time.'"\
+        - Of course, this analogy is a joke. He's playing to the crowd.\
+          But... he's utterly wrong, for a couple of reasons:\
+            - First, types and tests aren't there to make development\
+              faster. They're there to protect against catastrophic\
+              failure:\
+                - Types, specifically, provide universally quantified\
+                  protection against whole classes of bugs.\
+                    - In fact, if we use types correctly they can be\
+                      less of a road and more of one of those\
+                      old-fashioned vacuum tubes from supermarkets,\
+                      that pulls us directly towards a working program\
+                      with almost no capacity for errors.\
+                    - (See Amanda's talk about Types Versus Tests from\
+                      ScalaDays Amsterdam 2015. The idea of\
+                      universal/existential quantification comes from\
+                      there.)\
+            - Second, there's a huge misconception here. Types aren't\
+              just constraints. They're building blocks. They represent\
+              facts about our code, that we can access and build upon\
+              before we run our applications.\
+                - In modern Scala, we've got to a stage where types are\
+                  no longer guardrails.\
+                - They're construction workers that build the road for\
+                  us.\
+        - So this talk is a Scala-specific look at types:\
+            - I'll address the ways we can use types in a positive way\
+              to guide our programming...\
+            - ...and to guide the compiler to write code for us based\
+              on rules we define.\
+            - Finally, I'll look at modern Scala tooling that actually\
+              breaks down our types for us, looking at their structure\
+              and generating code based on their constituent parts.\
+            - We're getting some of that "it just works" property of\
+              dynamic languages, but without sacrificing that extra\
+              barrier between us and catastrophic failure.\
+    - Part 1 - Transportation with Types\
+        - Let's move beyond the basic Typescript idea and see some\
+          examples where types show us how to write the code\
+        - EXAMPLES:\
+            - Algebraic data types and structural recursion\
+            - Person on web site. Sending email:\
+                - (Describe person as visitor or registered user.)\
+                - We want to write a method to send an email a person.\
+                  Here's a code template:\
+                    - def sendEmail(person: Person, text: String): Unit\
+                      = ???\
+                - This is the method header, but what does the actual\
+                  code look like? I've used triple-question-mark here\
+                  to denote code that we haven't written yet.\
+                - Fortunately, the types tell us we know exactly what\
+                  to write. There are two types of Person: LoggedIn\
+                  users, who have an email address, and Visitors, who\
+                  do not. We distinguish between these types using\
+                  pattern matching:\
+                    - def sendEmail(person: Person) = \{\
+                        person match \{\
+                          case Visitor(cookieId) => ???\
+                          case LoggedIn(cookieId, email) => ???\
+                        \}\
+                      \}\
+                - Once we've done our pattern matching, we have two\
+                  places where we need to fill in the code.\
+                  Fortunately, these are trivial. We know for a visitor\
+                  that there's only one thing we can do: simply return.\
+                    - def sendEmail(person: Person) = \{\
+                        person match \{\
+                          case Visitor(cookieId) => () // Do nothing\
+                          case LoggedIn(cookieId, email) => ???\
+                        \}\
+                      \}\
+                - For the logged in user, we have an email address so\
+                  we can actually send the email:\
+                    - def sendEmail(person: Person) = \{\
+                        person match \{\
+                          case Visitor(cookieId) => () // Do nothing\
+                          case LoggedIn(cookieId, email) =>\
+                      actuallySendEmail(email)\
+                        \}\
+                      \}\
+            - The Person simple example shows how types can be used to\
+              guide our programming. We didn't know what to do with a\
+              Person, so we pattern matched to get to cases where we\
+              did know what to do. Let's look at another example...\
+                - Linked lists are a ubiquitous data structure. There's\
+                  a built-in linked list in Scala, but I'm going to\
+                  invent my own here as an example.\
+                - You'll be unsurprised to know that a linked list is\
+                  an algebraic data type, just like Person:\
+                    - sealed trait List[A]\
+                      final case class Pair[A](head: A, tail: List[A])\
+                      extends List[A]\
+                      final case class Empty[A]() extends LinkedList[A]\
+                - Let's consider the example of writing "map" for a\
+                  linked list. Here's the method signature:\
+                    - def map[A](list: List[A], func: A => B): List[B]\
+                      = ???\
+                - The map method takes as parameters a list of As and a\
+                  function from A to B. Informally, its job is to apply\
+                  the function to every A, turning it into a B, and\
+                  accumulating a list of Bs.\
+                - So what do we do in our example? It's not clear at\
+                  the moment what code to write, so we'll do our\
+                  structural recursion thing again and expand the code\
+                  out with some pattern matching:\
+                    - def map[A](list: List[A], func: A => B): List[B]\
+                      = \{\
+                        case Pair(head, tail) => ???\
+                        case Empty() => ???\
+                      \}\
+                - And now, if we look at this like a logic puzzle, the\
+                  solution becomes clear.\
+                - We have access to a handful of variables of fixed\
+                  types (head is an A, tail a list of A, and so on) and\
+                  a handful of methods to combine them. In fact,\
+                  there's only one way we can write this code to get it\
+                  past the compiler.\
+                - Let's look at the Empty() case first because it's\
+                  simplest. We have an empty list of As and a function\
+                  from A to B, and we have to build a list of Bs. We\
+                  can't use the function because we have no As, so all\
+                  we can do is construct an empty list of Bs:\
+                    - def map[A](list: List[A], func: A => B): List[B]\
+                      = \{\
+                        case Pair(head, tail) => ???\
+                        case Empty() => Empty()\
+                      \}\
+                - And in the pair case, we have the head--an A--and the\
+                  tail-- a List[A]--and we need to build a List[B].\
+                - We can build a List[B] in two ways: with the Empty()\
+                  constructor (unlikely to be useful), or with the\
+                  Pair() constructor, which needs a B and a List[B].\
+                - We can turn the head into a B using func:\
+                    - def map[A](list: List[A], func: A => B): List[B]\
+                      = \{\
+                        case Pair(head, tail) => List(func(a), ???)\
+                        case Empty() => Empty()\
+                      \}\
+                - But how do we turn the tail into a List[B]? (Appeal\
+                  to the audience.) Right---using map! So the solution\
+                  is recursive:\
+                    - def map[A](list: List[A], func: A => B): List[B]\
+                      = \{\
+                        case Pair(head, tail) => Pair(func(a),\
+                      map(tail, func))\
+                        case Empty() => Empty()\
+                      \}\
+                - So the point here is that we have a recursive\
+                  algorithm that's fairly complex in comparison to most\
+                  commercial programmers' day-to-day, but the types\
+                  have done almost all of the work for us.\
+                - The types are pulling us towards a solution, like the\
+                  tube in the supermarket.\
+        - So this is how types can document our code and guide us\
+          towards the right solution. Rich Hickey called them\
+          "guardrails" but I'm likening them to a vacuum tube.\
+        - The examples I've used have been small and abstract, but\
+          these patterns appear everywhere in functional programming.\
+          Hopefully I've given the skeptical among you a little taste\
+          of how Scala developers can use types to guide our code and\
+          our way of thinking.\
+            - In fact, there's a general rule of thumb that the more\
+              abstract the types we have, the fewer ways there are of\
+              combining them, and the easier it is to write the code.\
+              This rule goes hand-in-hand with the idea of modularity,\
+              where we're splitting our code into small problems and\
+              solving each once and once only.\
+    - Part 2 - Construction with Types\
+        - But types can do lots more than this.\
+    - Part 3 - Types as rocket fuel\
+}

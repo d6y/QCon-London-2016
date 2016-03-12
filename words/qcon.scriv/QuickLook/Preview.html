@@ -1,0 +1,472 @@
+<html>
+
+<head>
+<title>qcon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+	body {background-color: #bac0c7}
+    p.binderItem {margin: 10.0px 0.0px 0.0px 05.0px; font-family:Cochin, Times, Courier, Arial, serif; font-size:14.0px;}
+    .page {border: 1px solid #727272; background: #fff}
+    hr {
+      border-top: 1px dashed #000;
+      border-bottom: 0px solid #fff;
+      color: #fff;
+      background-color: #fff;
+      height: 0px;
+  </style>
+</head>
+
+<body>
+
+<table border="0" width="100%" cellspacing="3">
+<tr>
+<td>
+
+<table class="page" width="100%" cellspacing="10" cellpadding="2">
+<tr>
+<td valign="top">
+
+<ul>
+<li>
+<p class="binderItem"><strong>Welcome</strong><br/>Motivation</p>
+</li>
+<hr/>
+<ul>
+<li>
+<p class="binderItem"><strong>This is a talk about Scala</strong><br/>Me & Scala</p>
+</li>
+<li>
+<p class="binderItem"><strong>Negative</strong><br/><br/>
+And it manifests itself in a number of ways.  I quite like the way it’s phrased here.<br/>
+<br/>
+Where in the first year we dive in and love the conciseness of the language and get into the power, but … then realise what you’ve written needs to be a bit simpler.<br/>
+<br/>
+I find that a bit strange because it doesn't have to be like that.<br/>
+<br/>
+Now,  no language is perfect, all languages have their hard parts, but it seems like Scala has been in the spotlight over this recently.<br/>
+<br/>
+When we’re talking about getting a lot ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Positive</strong><br/>You'll see people talking development in terms like this.  <br/>
+This idea of writing down a type signature, and following the type to an implementation.<br/>
+That sounds almost mystical.<br/>
+<br/>
+“Follow the types”<br/>
+<br/>
+This is definitely something I identify with.<br/>
+<br/>
+And I want to get across the idea of why we bother, what the pay off is, for using types.<br/>
+</p>
+</li>
+<li>
+<p class="binderItem"><strong>Ideas</strong><br/>We have these two themes.<br/>
+<br/>
+1. We'll be looking at straightforward development with Scala. <br/>
+<br/>
+2. And the ideas of what types can really do for us. <br/>
+<br/>
+It may seem there a little bit of tensions between these ideas.  But I see it as a progression.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Agenda</strong><br/>We'll deal with these ideas in three parts.<br/>
+<br/>
+I'll start with some Scala, looking at patterns for simple Scala.  We won’t spend too much time there.<br/>
+<br/>
+We'll move on from that and take a look at a really simple functional idea,<br/>
+encoding it as a type, and what it gets us.<br/>
+<br/>
+And in the final part I'll try to share an idea of how this progresses into typelevel programming, where the compiler is doings ome of our work for us.<br/>
+<br/>
+I’ll work through tree examples to try to make this as concrete as possible.<br/>
+...</p>
+</li>
+</ul>
+<hr/>
+<li>
+<p class="binderItem"><strong>PART 1</strong><br/>Straightforward Scala</p>
+</li>
+<hr/>
+<ul>
+<li>
+<p class="binderItem"><strong>Why? - Go</strong><br/>Let’s get going.<br/>
+<br/>
+But Scala is an un-opinionated language, and that can lead to some tricky situations. and developers taking different routes through the features on offer.<br/>
+<br/>
+There was a post at the end of last year about a team, they were debugging a production problem…<br/>
+<br/>
+And they only had one issues: they had no idea what the code was doing.<br/>
+<br/>
+They came across a strange symbol.  Which they called the starship operator.<br/>
+<br/>
+Someone said out loud “what the hell is that?”.<br/>
+<br/>
+And I think that's probably...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Power</strong><br/>If you're running a team, then you want them to have access to all the best power tools - there’s a lot of potential productivity there.  But you also want code that people want to work with, that no-one is alienated.<br/>
+<br/>
+What can we do about that?</p>
+</li>
+<li>
+<p class="binderItem"><strong>What can we do?</strong><br/>One thing is to be opinionated.<br/>
+<br/>
+Here are 6 core Scala features that we think are the ones you need to know for everyday programming.<br/>
+These are productive features.<br/>
+<br/>
+There are more things in Scala, but we don't use them very often.<br/>
+Other features are important for getting to the full power, but in an application… don’t use them so much.<br/>
+<br/>
+Some organizations  already are opinionated. They know what they like, and that’s what they use, and they have a way to introduce new ideas.<br/>
+For example, ING ba...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Two</strong><br/>I've picked out these two to talk about,<br/>
+because I think it's maybe not a style much used in the Java world.<br/>
+<br/>
+So hopefully will give you an idea of what I mean by straightforward. So maybe it’ll give you something new to see.  <br/>
+<br/>
+But also these two are very common patterns we’re going to use throughout this talk. And I hope you’ll agree they lead to easily understood code, which means easy to maintain, also start to introduce types helping us.</p>
+</li>
+<li>
+<p class="binderItem"><strong>ADT & SR</strong><br/>These might be unfamiliar terms to some of you.<br/>
+<br/>
+Terminology can be daunting.<br/>
+Functional programming feels like it has a lot of terminology,<br/>
+but that's probably because functional programming are basically bandits, stealing all the good ideas from maths and logic.<br/>
+<br/>
+Most of the common terms are pretty easy to work through.<br/>
+<br/>
+I help run an functional programming meet up, and occasionally through some of these terms on a white board, unpick them, and see what they look like in different programming ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Spec</strong><br/>So let's return to our specification.  A visitor is anonymous or logged in.<br/>
+<br/>
+In code that becomes a trait or abstract class.  And two sub types.  <br/>
+<br/>
+The sealed part means the compiler will check that there are no other kinds of visitors for us to deal with.<br/>
+Very handy as code evolves. If you introduce new types of visitor, the compiler will tell you if you've not handled them in the code base.<br/>
+<br/>
+So we’ve translated our visitor is two kinds of things into code.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Spec 2</strong><br/>The second part of the specification is that logged in user has and ID and facts. And we've thrown in here that an anonymous user has an id.<br/>
+Because we probably track them.<br/>
+<br/>
+Now our code goes from this, to this encoding where we have the ORs.<br/>
+You can still be anonymous or a user.<br/>
+but we've no encoded the ands: A user has an id and a list of facts about them.<br/>
+<br/>
+That's the data side of things.</p>
+</li>
+<li>
+<p class="binderItem"><strong>SR</strong><br/>Now we need to do something with that data.<br/>
+And that's the role of structure recursion.<br/>
+<br/>
+As an example, perhaps we need to serve a advert for a visitor.<br/>
+<br/>
+How to we implement this method?<br/>
+<br/>
+We don't have to think to hard. We've done the thinking part in setting up the data.<br/>
+We now need to deal with the two cases.<br/>
+<br/>
+And in Scala we can do that with pattern matching.  And don’t confuse that with regular expressions.  We’re matching on the types and the structure inside the types.</p>
+</li>
+<li>
+<p class="binderItem"><strong>serveAd</strong><br/>So we match on our visitor, and we know there are two cases to deal with.<br/>
+<br/>
+This is two patterns: the first is the case of a User, we don't care what their ID is, but we are going to use whatever info we have about them.<br/>
+<br/>
+The second pattern is the anonymous user case, and here we are picking up whatever id they have.<br/>
+<br/>
+And we can produce some advert however we want. In the case of the user, maybe we find a relevant ad.<br/>
+For an anonymous user, maybe we rotate based on their cookie id.<br/>
+<br/>
+For the logge...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Structure</strong><br/>One thing I love about this code, is the amount of structure I get.<br/>
+<br/>
+If I was working in a dynamic language, maybe JavaScript, perhaps I’d just have an object with some properties in it. Rather than match on an anonymous user, I could stick my hand in that bag and rummage around for some property that would tell me it’s an anonymous user.  That’s great, because I can throw in more properties without any ceremony.<br/>
+<br/>
+I could write an IF here… if my user object has an anonymous flag, then I do one t...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Summary</strong><br/>That kind of code, is pretty straightforward. You can be productive, and it occurs frequently, including in the standard library.<br/>
+<br/>
+You have to decide to write code that way. You have to be opinionated in what you use, and that’s how you avoid opening the code and saying “what the hell is that”.<br/>
+<br/>
+<br/>
+And we started to see how types start to help us, by having some structure to work with, but let’s look at other ways they help.</p>
+</li>
+</ul>
+<hr/>
+<li>
+<p class="binderItem"><strong>PART 2</strong><br/>Types help us solve problems.</p>
+</li>
+<hr/>
+<ul>
+<li>
+<p class="binderItem"><strong>Set up</strong><br/>What do I mean by helping?<br/>
+<br/>
+When I’m writing software, I want to make some progress.<br/>
+And the recognition of a type can help me do that.<br/>
+And when I see the idea, or type, I can automatically - almost mechanically - know what to do with that type.<br/>
+<br/>
+In other words, it’ll help me get on with my job.<br/>
+<br/>
+That’s the kind of help I mean.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Scenarios</strong><br/><br/>
+To explain this, here are a list of things you might do when building an application.<br/>
+<br/>
+Typically you need to be able to combine things together.  <br/>
+Bring two lists together and squish them into one.<br/>
+Bring some statistics together and boil  them down to something.<br/>
+Gather messages and present them to a user.<br/>
+<br/>
+We can approach all of these problems in terms of two things.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Combinable as a concept</strong><br/>And those two things are: a function for combining, and a value to represent nothing — the starting or empty value.<br/>
+<br/>
+What would that look like?<br/>
+<br/>
+If you want to sum numbers, the combiner is addition and the starting point is zero.<br/>
+<br/>
+If you want to combine text, you start with the empty string, and in Java and Scala use the + operator<br/>
+<br/>
+Note that we not doing the same thing in each case. But the structure of the problem is the same.  The fact that we use the + operation for numbers and the same symb...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Monoid</strong><br/>So this is pattern that occurs.<br/>
+And when we see patterns, we give them labels, or names<br/>
+And this is referred to as a monoid.<br/>
+There’s another aspect to monids, the laws, that we get to.  <br/>
+<br/>
+The name monoid, it’s a functional programming term, and as I mentioned earlier this is a concept from maths. Hence the weird and scary name.<br/>
+<br/>
+It’s another unfamiliar term, but hardly complicated. <br/>
+<br/>
+There’s only one time when Monoids are scary.<br/>
+That’s the 1966 Dr Who season that featured a creature called Monoi...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Example: list of numbers</strong><br/>So what? We’ve given a name to a simple thing. How does that help us?<br/>
+<br/>
+Let’s work through some examples, starting simply and building up to something bigger.<br/>
+<br/>
+The boss says: those visitors we had, from earlier in the talk.  What’s the stats for the web site traffic? <br/>
+<br/>
+If we know how many pages each visitor accessed, what’s the total?<br/>
+<br/>
+This is a trivial problem, right?<br/>
+You know how to solve using a loop, or a library function.<br/>
+You just have to add up the numbers.<br/>
+<br/>
+Let’s see what it looks like as ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>For any T</strong><br/>The basic pattern we’ve seen is this: for any T , we need an empty and a combine.<br/>
+<br/>
+And the interface for that could be this.  This is two effectively abstract methods. One called called empty that must return a T whenever we implement it. And a function to combine two Ts into one T.<br/>
+<br/>
+An actual instance of that could for addition could he this.<br/>
+This is an instance of our Monoid interface.  It works on Integers.  The empty value is zero. That’s what we need to start from for addition to work. And ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>What is fold</strong><br/>Keeping with the theme of simplicity, we can write a fold function.<br/>
+<br/>
+This is a version that’s hard coded for addition. We will generalize it in a moment.<br/>
+<br/>
+We have values in a list.<br/>
+What we do here is match on our list of values,<br/>
+And in the case of an empty list, Nil, the value to return is the empty value.<br/>
+If, on the other hand, our list is made up of a value and the rest of the list, our result is that value and whatever we get from folding on the rest of the list.  So it’s a recursive algorith...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Generalizing</strong><br/>That’s OK, but hard coded.  To generalize it we can drop in our monoid class.  That’s a parameter to fold, and we replace our hard coded values with empty and combine.<br/>
+<br/>
+<br/>
+But we can go more general.<br/>
+<br/>
+If we remove mention of Int, and say for some type T…. If we have a list of T and a monoid for those Ts, then… nothing else changes in the implementation.<br/>
+</p>
+</li>
+<li>
+<p class="binderItem"><strong>Split</strong><br/>Notice, by the way, that m.empty is the only value we could have put in here. What we need to return is a T, and the only value we have of T in scope is empty.  So imagine, sitting in your editor.  And you’ve written up to here.<br/>
+<br/>
+What can you put in place of the blue question marks? You need the value T.   You’ve got an emty list, so that’s no help.  The only value you have is empty. <br/>
+ Some languages can figure that out for you.  So Idris, for example, a totally different language, you could put...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Do we like this code?</strong><br/>Although we’ve got to something more general, that’s an illustration.  I’d probably use an existing library for this that typically is still more general, not requiring a list either.  The same idea can be used to “fold over” a vector, or a map, or a tree. And would be more efficient, and at least do tail recursive.<br/>
+<br/>
+But the basic idea is this, and I wanted to show that it isn’t a complicated idea <br/>
+<br/>
+<br/>
+<br/>
+So what… we have a name for something simple, a monoid, and we can operate on it with a fold.<br/>
+<br/>
+...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Benefits</strong><br/>Here are the main three benefits I see from us thinking in terms of monoids.<br/>
+<br/>
+We get flexibility, we get to re-use monoids as they compose, and we get help problem solving.<br/>
+<br/>
+Now composition, isn’t something I’m going to talk about. The idea is broadly that you can use monoids as building blocks to get monoids for more complicated structures.<br/>
+<br/>
+I want to focus on these other two.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Distinct</strong><br/>Functionality grows, because that’s what functionality does, and we’re asked about distinct visitors.<br/>
+<br/>
+That is, of all the different visitors we get, we have various IDs, and we want to know how many different visitors we saw in some selection of the traffic.<br/>
+<br/>
+How can we create that report?  Well, one way is to use a Set.  That is we can fold our visitors over a Set.  What do we need to do that? <br/>
+<br/>
+We need an empty value, and a way to combine values.  Which we’ve seen already.  We’d implement a m...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Hyper</strong><br/>Or maybe the boss says: argh, we’re out of memory.<br/>
+<br/>
+Our list of visitors is too big here. What can we do? <br/>
+<br/>
+There are algorithms that give you very good estimations.  An example is HyperLogLog.  This description doesn’t explain much about what hyperloglog does, but you’ll see it follows our monoid pattern. In some ways, great, we don’t have to understand it.  We can apply it, and it’s a one line change to our code.<br/>
+<br/>
+If you do want to know what the heck HyperLogLog is, there’s a record you can fi...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Parallel laws</strong><br/>What other flexibility do we get? We can safely apply our monoid in parallel.<br/>
+<br/>
+Our counting or hyperloglog-ing, or looking for distinct visitors can all be safely split up into multiple jobs, and combined back into a single value.  And we know that because of laws.<br/>
+<br/>
+This is something else that functional programming has done for us. To be a monoid you have to have the structure I mentioned, but you also need to follow the monoid laws. And there are two laws.  And the laws are really what make so...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Thinking</strong><br/>Those benefits…<br/>
+- Laws, so we know what the monid is defined as, allowing us to do things like run our computation safely in parallel.<br/>
+- Being able to drop in other instances, because we can fold over our data using whichever instance we want<br/>
+- Being able to compose instances<br/>
+…They are great.<br/>
+<br/>
+There’s one more benefit I want to talk about.  And this is more general in the sense that it helps guide us as we write software.<br/>
+<br/>
+Let me give you an example.</p>
+</li>
+<li>
+<p class="binderItem"><strong>Atom</strong><br/>There’s a text editor called Atom.<br/>
+It’s a very nice open source editor from Github.<br/>
+<br/>
+And there’s a project called ENSIME which adds Scala support into various editors, including Atom.<br/>
+<br/>
+And I wanted to add a feature to it.  There’s a bar at the bottom of the editor.  Normally, it’s open and shows you details of compiler error and warnings. But when it’s closed like this, I want  to see me this summary of errors.<br/>
+<br/>
+In this project it’s telling me about 10 errors.<br/>
+<br/>
+To get that count, the way this wo...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Summary</strong><br/>We’ve looked at a very simple idea, and I’ve tried to give you an fel of how that actually helps us, in the real world, sitting at a keyboard.  Sorry, stand at a keyboard.<br/>
+<br/>
+There are many more ideas in functional programming.  And there are patterns and laws behind them, <br/>
+<br/>
+But there’s only a handful that I find myself using<br/>
+<br/>
+Despite functional programming, types, and indeed maths, being a big area to explore.<br/>
+<br/>
+There’s another way that types can help us.</p>
+</li>
+</ul>
+<hr/>
+<li>
+<p class="binderItem"><strong>PART 3</strong><br/>Libraries unlock power in a safe way, reduce repetition in your code. Level up by sharing what you know.</p>
+</li>
+<hr/>
+<ul>
+<li>
+<p class="binderItem"><strong>A taste of typelevel</strong><br/>Even though we’re using straightforward parts of Scala, and only looked at a very simple type.<br/>
+<br/>
+We’ve not used any exotic features, but we’re also not excluded from using other parts of Scala when we need them.<br/>
+<br/>
+In this last section I want to give you a taste of what that could be.  And how the compiler can do some of our work for us.<br/>
+<br/>
+I have two example to share.  The first is to illustrate that we can push things we might usually view as runtime concerns down to the the compiler.  And anytime ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Sized</strong><br/>Instead what we can do is ask the compiler to check the lengths match up.<br/>
+<br/>
+Here’s my CSV method.  And as you’d expect the first argument is a list of strings, and the second argument is a list of rows, and each row is a list of strings.<br/>
+<br/>
+The length of each row should match the length of the header.<br/>
+The surprising thing is that this is possible with Scala.  And it’s possible because of some features that are called out as being complex, or undesirable. <br/>
+<br/>
+But we we can benefit from those features ...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Merge</strong><br/>It’s reasonably common to have to compare data structures in some way.  Merging database records with user data. And that can involve partial updates.<br/>
+<br/>
+For example, our user class from earlier.  Maybe we have these three fields: a database id, a name and an optional email address.<br/>
+<br/>
+And we get updates to this record across the web. I’m showing some kind of patch request here. Just the name is being sent. But you can imagine different ways a user is supplying just one thing to update. Especially w...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Summary</strong><br/><br/>
+The point here is to flag that the compiler can do more than maybe we usually let it do. And you may find situations where you benefit from that.<br/>
+<br/>
+In the case of that sized collection, we’re getting some compile-time assurances; in the case of the merging, we’re also saving ourselves a fair bit of code without resorting to run-time reflection.<br/>
+<br/>
+And if you decide to use libraries like this, or make use of the power features of Scala….<br/>
+</p>
+</li>
+<li>
+<p class="binderItem"><strong>Go one of two ways</strong><br/>Well, that can go two ways.<br/>
+<br/>
+You can end up with a surprise in the code, and someone saying: what the hell is this?<br/>
+Or you can share the knowledge around, discuss what you want, and then the team can get a “It’s a monoid, I know this” moment.<br/>
+<br/>
+This brings us back round to the issue of Scala being complex. It has powerful features, and yes they are involved. But you can grow into them, if you need.<br/>
+<br/>
+If we look back to 2008, we see Scala described like this: Scala stands for scalable language. It ...</p>
+</li>
+</ul>
+<hr/>
+<li>
+<p class="binderItem"><strong>Summary</strong><br/>Take home points: be opinionated; types help you progress implementation; lots of power when you need it.</p>
+</li>
+<hr/>
+<ul>
+<li>
+<p class="binderItem"><strong>Keypoints</strong><br/>What have we seen?<br/>
+<br/>
+We started with some very straightforward scala code. That’s a style of code I use a lot, starting with writing down the types, and figuring out how I want to operate with them.  There was nothing complicated there. The take away point: is have an opinion on what you use from the language.<br/>
+<br/>
+We took a look at a very simple functional programming idea, the monoid. What I’d like you to remember from that the ideas from functional programming help as your solving problems.  They’...</p>
+</li>
+<li>
+<p class="binderItem"><strong>Thanks</strong><br/>Amanda<br/>
+Wesley<br/>
+Noel<br/>
+Dave<br/>
+Miles<br/>
+Jono<br/>
+Julio Capote<br/>
+Alessandro Zoffoli</p>
+</li>
+</ul>
+</ul>
+
+</td>
+<td width="8">
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

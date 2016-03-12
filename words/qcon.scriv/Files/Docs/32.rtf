@@ -1,0 +1,37 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 Cochin;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\fi360\sl288\slmult1\pardirnatural
+
+\f0\fs28 \cf0 Instead what we can do is ask the compiler to check the lengths match up.\
+\
+Here\'92s my CSV method.  And as you\'92d expect the first argument is a list of strings, and the second argument is a list of rows, and each row is a list of strings.\
+\
+The length of each row should match the length of the header.\
+The surprising thing is that this is possible with Scala.  And it\'92s possible because of some features that are called out as being complex, or undesirable. \
+\
+But we we can benefit from those features via a library.  \
+\
+So in this case we can make use of a library, a library called shapeless.\
+\
+The change to the code \'85 is something you\'92d take from the documentation.  It puts a type parameter on csv, N, which had better be a natural number.  Because we\'92re going to be counting something.\
+\
+And then our header and rows are wrapped in a Sized type, both of which share this N.  In other words, the compiler is going to have to be happy that headers and rows both have this same N.  The same length.\
+\
+\
+When we call CSV, we need a Sized collection, which we get from a constructor.  So Sized Date there is constructing a List with a Size, or N of 1.\
+And because that doesn\'92t match the length of my rows, it will be a compiler error.\
+\
+I\'92m not showing you this to say: wow, go use this in your code. I\'92m showing it because it maybe a surprise that the Scala compiler can do these kinds of tricks.  These kinds of things open my mind to the idea that maybe I can push more work down on the compiler.\
+\
+You may find you have practical occasion  to use this, but it\'92s really only viable for small lists, and although this does produce a compiler error, it\'92s a whopper.  And although the information is there\'85 it\'92s exposing a lot of how the library is working.  \
+\
+The error follows the normal conventions. It\'92s saying there\'92s a type error. It found a size of natural number 1, but required a successor of 1 (or 2 as we often call it).  And it tells you where it happened, but \'85 not a lot of fun wading through those.\
+\
+But\'85 what do you prefer: the compiler catching errors, or having runtime errors?\
+\
+Let\'92s look at another example.\
+One which is more useful and practical.\
+\
+And one that has much better error messages, but is in the same area as capturing things at compile time.\
+}

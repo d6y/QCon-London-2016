@@ -1,0 +1,156 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+\deftab720
+\pard\pardeftab720\sl280
+
+\f0\fs24 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 # What is a Semigroup?\
+\
+A *semigroup* is a tool for combining values. Many different types have a natural "addition" operator: integers can be added, strings can be appended, sets can be unioned, and so on. Semigroups provide a unified way of performing these operations. Here are some examples:\
+\
+~~~ scala\
+import cats._\
+import cats.std.all._\
+~~~\
+\
+Let's start by adding some integers. We'll summon the `Semigroup` for `Int` and use it to combine a couple of integers:\
+\
+~~~ scala\
+val intSemigroup = Semigroup[Int]\
+val intResult = intSemigroup.combine(1, 2)\
+~~~\
+\
+As we can see, the `combine` method on the `Semigroup` is implemented as an integer addition. This isn't the only way of combining integers, but it seems like a sensible default. How about some `Strings`?\
+\
+~~~ scala\
+val stringSemigroup = Semigroup[String]\
+val stringResult = stringSemigroup.combine("1", "2")\
+~~~\
+\
+The `combine` operation for `Strings` is string append. Again, this seems like a sensible default. Summoning `Semigroups` manually like this is a bit verbose, though. Fortunately, Cats provides some nice "syntax" for combining values in the form of the `|+|` operator:\
+\
+~~~ scala\
+1 |+| 2\
+"1" |+| "2"\
+~~~\
+\
+`|+|` automatically summons the relevant semigroup for us implicitly so we don't have to look it up ourselves.\
+\
+Ok. So we can combine `Ints` and `Strings` using the same generic operator. What does this get us? Not a lot apparently---Scala already lets us add `Ints` and `Strings` using the regular `+` operator. However, Cats goes further than this. For example, can also append `Lists` and union `Sets` using `|+|`:\
+\
+~~~ scala\
+List(1, 2) |+| List(3, 4)\
+Set(1, 2) |+| Set(3, 4)\
+~~~\
+\
+We can even merge `Maps` provided Cats knows how to merge their keys:\
+\
+~~~ scala\
+Map("a" -> 1, "b" -> 2) |+| Map("b" -> 3, "c" -> 4)\
+Map(1 -> "a", 2 -> "b") |+| Map(2 -> "c", 3 -> "d")\
+~~~\
+\
+This last case is interesting because it shows the power of type classes and implicit resolution. Cats' provides a semigroup for `Maps` that merges their keys. Where keys conflict, the semigroup needs to merge the values. How does it merge the values? It uses a semigroup! In other words, Cats can provide us with a semigroup for any `Map[A, B]` provided it can also provide a semigroup for `B`. Here's another example:\
+\
+~~~ scala\
+val m1 = Map("a" -> List(1, 2, 3), "b" -> List(4, 5, 6))\
+val m2 = Map("b" -> List(7, 8),    "c" -> List(9, 0))\
+m1 |+| m2\
+~~~\
+\
+# Why is a semigroup useful?\
+\
+Like many of Cats' type classes, we can use semigroups in three ways:\
+\
+1. We can either code that is generic across "combinable" data types. For example, here is a method that can combine the items in any non-empty `List[A]` provided we can summon a `Semigroup` for `A`:\
+\
+   ~~~ scala\
+   def combineListItems[A](list: List[A])(implicit semigroup: Semigroup[A]): A =\
+     list.reduceLeft(_ |+| _)\
+\
+   combineListItems(List(1, 2, 3))\
+   combineListItems(List("1", "2", "3"))\
+   ~~~\
+\
+2. We can implement semigroups for our own data types, allowing us to combine them using `|+|`. For example, here is a semigroup that can combine any tuple `(A, B)` provided we know how to combine values of types `A` and `B`:\
+\
+   ~~~ scala\
+   implicit def tupleMonoid[A, B](implicit semiA: Semigroup[A], semiB: Semigroup[B]): Semigroup[(A, B)] =\
+     new Semigroup[(A, B)] \{\
+       def combine(x: (A, B), y: (A, B)): (A, B) = \{\
+         val (xa, xb) = x\
+         val (ya, yb) = y\
+         (xa |+| ya, xb |+| yb)\
+       \}\
+     \}\
+   ~~~\
+\
+3. Cats provides higher-level methods that use semigroups to provide more advanced generic operations on our data. Here's a simple example---the `combineN` method combines an element with itself *n* times:\
+\
+   ~~~ scala\
+   5 combineN 3\
+   "5" combineN 3\
+   List(1, 2, 3) combineN 3\
+   ~~~\
+\
+   We'll see much more compelling examples of high-level operations in the next section.\
+\
+# What is a Monoid?\
+\
+Being able to combine elements using a semigroup is undoubtedly useful. However, we are slightly restricted in that we need two elements of a given type before we can combine them. Monoids extend semigroups by providing a "zero" element that allows us to fold over collections and much, much more.\
+\
+A `Monoid` is, very simply, a `Semigroup` that provides one extra method called `zero`:\
+\
+~~~ scala\
+val intMonoid = Monoid[Int]\
+\
+intMonoid.combine(1, 2)\
+\
+intMonoid.zero\
+~~~\
+\
+~~~ scala\
+val setMonoid = Monoid[Set[String]]\
+\
+setMonoid.combine(Set("a", "b"), Set("b", "c"))\
+\
+setMonoid.zero\
+~~~\
+\
+Monoids can do everything that semigroups can do, so all of the examples above work just as well. In addition, they allow us to write more powerful generic methods. For example, we can now rewrite our `combineListItems` method to work with empty lists as well as non-empty ones:\
+\
+~~~ scala\
+def combineListItems[A](list: List[A])(implicit monoid: Monoid[A]): A =\
+ list.foldLeft(monoid.zero)(_ |+| _)\
+\
+combineListItems(List(1, 2, 3))\
+combineListItems(List("1", "2", "3"))\
+combineListItems(List.empty[Int])\
+combineListItems(List.empty[String])\
+~~~\
+\
+We also have access to lots more high-level functionality from Cats. For example, Cats provides a `Foldable` type class:\
+\
+~~~ scala\
+val listFoldable = Foldable[List]\
+~~~\
+\
+`Foldable` provides numerous methods for folding over collections. One such method is `foldMap`, which maps a function over a collection and reduces all the items using a `Monoid`:\
+\
+~~~ scala\
+listFoldable.foldMap(List(1, 2, 3))(_.toString)\
+~~~\
+\
+`foldMap` is also available as syntax, so we can write it infix as if it was a method defined directly on `List`:\
+\
+~~~ scala\
+List(1, 2, 3).foldMap(_.toString)\
+~~~\
+\
+Lots of power is emerging here. We can now write generic code to fold over arbitrary collections producing results of arbitrary types. All we need is a `Foldable` and a `Monoid` of the right type:\
+\
+~~~ scala\
+// TODO: Example\
+~~~\
+}

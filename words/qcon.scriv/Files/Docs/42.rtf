@@ -1,0 +1,21 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 Cochin;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\fi360\sl288\slmult1\pardirnatural
+
+\f0\fs28 \cf0 Even though we\'92re using straightforward parts of Scala, and only looked at a very simple type.\
+\
+We\'92ve not used any exotic features, but we\'92re also not excluded from using other parts of Scala when we need them.\
+\
+In this last section I want to give you a taste of what that could be.  And how the compiler can do some of our work for us.\
+\
+I have two example to share.  The first is to illustrate that we can push things we might usually view as runtime concerns down to the the compiler.  And anytime we do that, the benefit is catching a problem when you press save in your editor,  rather than when you run the code.\
+\
+And we can write simple methods that take a list of headers, and a list of rows.  And somehow turn that into CSV.\
+One thing that can go wrong is we don\'92t have the right headers.  Code changes over time, new fields get added to a report, and the column headers sometimes go missing. It\'92s not the end of the world, not a huge deal.\
+\
+What can we do to prevent that?\
+We can write a unit tests: good idea, nothing wrong with doing that. \
+We can add a check inside our csv method:  some kind of assertion that headers and the rows should be the same length.\
+But that\'92s not great as it\'92ll give us an error at runtime.  At least with our bug, we get a report at runtime.\
+}

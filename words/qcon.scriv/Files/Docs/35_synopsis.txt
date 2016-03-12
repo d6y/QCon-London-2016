@@ -1,0 +1,1 @@
+Take home points: be opinionated; types help you progress implementation; lots of power when you need it.

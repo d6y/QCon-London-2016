@@ -1,0 +1,31 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 Cochin;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\fi360\sl288\slmult1\pardirnatural
+
+\f0\fs28 \cf0 It\'92s reasonably common to have to compare data structures in some way.  Merging database records with user data. And that can involve partial updates.\
+\
+For example, our user class from earlier.  Maybe we have these three fields: a database id, a name and an optional email address.\
+\
+And we get updates to this record across the web. I\'92m showing some kind of patch request here. Just the name is being sent. But you can imagine different ways a user is supplying just one thing to update. Especially with ajax based interfaces where updates are being fired at a server as soon as you move out of a field.\
+\
+Maybe what we want to do is represent an Update.  The id won\'92t update, but we might (optional) get an update to a name; and we might also get an email address update. Or possibly both.\
+\
+What we want to get to is: taking a user, taking an update, and merging them sensibly.  We preserve existing fields. We update fields we are told to update.\
+\
+Scala lets you do that, and check the fields all match up at compile time.  And it\'92s not for these specific classes: it\'92s can be done generically for any pair of classes. Without using run-time reflection or byte code hackery.\
+\
+ My colleague Dave Gurnell has put together a library, called bulletin. It\'92s  something like 60 lines of code.   But it\'92s using some pretty advanced features.\
+\
+And what does is provide a merge method, and this method type checks the fields of whateve case class it\'92s given: so user and the update in this case. And it\'92ll merge sensibly.  This is really doing two things for us:  it\'92s saving us from a lot of boring field-by-field comparisons, but it\'92s also helping us with code maintenance. If I make a change so the user and update classes mismatch in some way, we\'92ll get a compiler error.\
+\
+And it\'92s a much nicer compiler error. So for example, if I rename user\'92s name field to be family name, I\'92m told my user and update don\'92t match.\
+\
+If you\'92re wondering how it can do that, well there are a couple of things.  At the most abstract level, it\'92s turning the user class and updated class into a list of the types.  So user is a String for name, and optional string for email, and maybe there are other fields.  And update is really a list of an optional string for name, and optional optional string for email.\
+\
+And what happens is that the library splits this type apart into a head and the rest. And then the compiler has to go recursively figure out if the types match on the rest of the list of types. And this\'85 if you recall\'85 is the same pattern we used implementing fold.  Split a list into the head and rest, recurse on the rest.  Except in this case it\'92s happening at the type level, with the work being done by the compiler. \
+\
+But it\'92a also able to do that because Scala supports features like type constraints, implicit methods, allows us to create a hetrogenous list\
+\
+So we need those features, but we don\'92t need them when we write this.\
+}

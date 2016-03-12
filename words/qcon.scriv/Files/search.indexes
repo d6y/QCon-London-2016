@@ -1,0 +1,1532 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<SearchIndexes Version="1.0">
+    <Documents>
+        <Document ID="39">
+            <Title>Negative</Title>
+            <Text>
+And it manifests itself in a number of ways.  I quite like the way it’s phrased here.
+
+Where in the first year we dive in and love the conciseness of the language and get into the power, but … then realise what you’ve written needs to be a bit simpler.
+
+I find that a bit strange because it doesn't have to be like that.
+
+Now,  no language is perfect, all languages have their hard parts, but it seems like Scala has been in the spotlight over this recently.
+
+When we’re talking about getting a lot out of the type system, we have to also address this kind of concern.
+
+The flip side of that is all about the benefits.</Text>
+        </Document>
+        <Document ID="61">
+            <Title>Typelevel</Title>
+        </Document>
+        <Document ID="54">
+            <Title>Distinct</Title>
+            <Text>Functionality grows, because that’s what functionality does, and we’re asked about distinct visitors.
+
+That is, of all the different visitors we get, we have various IDs, and we want to know how many different visitors we saw in some selection of the traffic.
+
+How can we create that report?  Well, one way is to use a Set.  That is we can fold our visitors over a Set.  What do we need to do that? 
+
+We need an empty value, and a way to combine values.  Which we’ve seen already.  We’d implement a monoid for sets, using union.
+
+It’s a one line change in the report.
+</Text>
+        </Document>
+        <Document ID="47">
+            <Title>Boss asks...</Title>
+            <Text>- the boss asks "how many people visited the website". `Int` is a monoid, so that's a `foldMap` over the data set.
+
+
+plus
+- Combinable and loop
+- a.k.a. Monoid and fold
+- import {monoid =&gt; combinable} ???
+- monoid word origin: no-one knows -&gt; http://math.stackexchange.com/questions/156952/why-the-terminology-monoid
+- do we care? not because we're proud of ignorance; we'd love to know more, but have other shit to do.</Text>
+        </Document>
+        <Document ID="62">
+            <Title>Go one of two ways</Title>
+            <Text>Well, that can go two ways.
+
+You can end up with a surprise in the code, and someone saying: what the hell is this?
+Or you can share the knowledge around, discuss what you want, and then the team can get a “It’s a monoid, I know this” moment.
+
+This brings us back round to the issue of Scala being complex. It has powerful features, and yes they are involved. But you can grow into them, if you need.
+
+If we look back to 2008, we see Scala described like this: Scala stands for scalable language. It is designed to grow with the demands of its users.
+That quote is from the first chapter of the Programming in Scala book.
+
+The text goes on to talk about being able to write scripts, or complete programmes, but this idea of growing with your demands is one worth keeping in mind. 
+
+The picture I have is something like this: where you use the straightforward parts with types whenever you can, dip into the power features if you need it. But you have to share that with your team.  We probably don’t take enough time in our teams to talk enough about what we like and don’t like.  But if we do, sharing what we learn, things that are complex start to at least become familiar. 
+
+</Text>
+        </Document>
+        <Document ID="55">
+            <Title>Hyper</Title>
+            <Text>Or maybe the boss says: argh, we’re out of memory.
+
+Our list of visitors is too big here. What can we do? 
+
+There are algorithms that give you very good estimations.  An example is HyperLogLog.  This description doesn’t explain much about what hyperloglog does, but you’ll see it follows our monoid pattern. In some ways, great, we don’t have to understand it.  We can apply it, and it’s a one line change to our code.
+
+If you do want to know what the heck HyperLogLog is, there’s a record you can find a nice talk from Papers we Love, on youtube.
+
+An there are many useful algorithms like this. If the boss asks who are the most frequent visitors, we can use another approximating algorithm like count min sketch.  Again the point here is to see the pattern, we’re not going to go into the details.  There’s a talk from Laura at Twitter you can find at the scala exchange conference web site.
+
+As an aide, those of you using Spark are maybe familiar with this already.  If you’re reducing any data, you’re maybe using a monoid.
+</Text>
+        </Document>
+        <Document ID="48">
+            <Title>Monoid</Title>
+            <Text>So this is pattern that occurs.
+And when we see patterns, we give them labels, or names
+And this is referred to as a monoid.
+There’s another aspect to monids, the laws, that we get to.  
+
+The name monoid, it’s a functional programming term, and as I mentioned earlier this is a concept from maths. Hence the weird and scary name.
+
+It’s another unfamiliar term, but hardly complicated. 
+
+There’s only one time when Monoids are scary.
+That’s the 1966 Dr Who season that featured a creature called Monoid.
+</Text>
+        </Document>
+        <Document ID="70">
+            <Title>Meta-Data</Title>
+            <Text>===== FEEDBACK ON DRAFT 1 =====</Text>
+        </Document>
+        <Document ID="63">
+            <Title>Simple?</Title>
+            <Text>Familiar
+Simple
+Easy</Text>
+        </Document>
+        <Document ID="56">
+            <Title>Thinking</Title>
+            <Text>Those benefits…
+- Laws, so we know what the monid is defined as, allowing us to do things like run our computation safely in parallel.
+- Being able to drop in other instances, because we can fold over our data using whichever instance we want
+- Being able to compose instances
+…They are great.
+
+There’s one more benefit I want to talk about.  And this is more general in the sense that it helps guide us as we write software.
+
+Let me give you an example.
+</Text>
+        </Document>
+        <Document ID="49">
+            <Title>For any T</Title>
+            <Text>The basic pattern we’ve seen is this: for any T , we need an empty and a combine.
+
+And the interface for that could be this.  This is two effectively abstract methods. One called called empty that must return a T whenever we implement it. And a function to combine two Ts into one T.
+
+An actual instance of that could for addition could he this.
+This is an instance of our Monoid interface.  It works on Integers.  The empty value is zero. That’s what we need to start from for addition to work. And combining two values is adding them.
+
+So we could use addition.empty in a loop, and addition.combine to bring values together in the loop.
+That would be horrible. I might look like this.
+
+And it’s horrible because we’re missing a theme that will recurr.
+When you have an encoding of something, there’s usual a general purpose function to go with it.
+
+Just as we saw earlier: we can encode ADT, and that’s mirrored by structural recursion for working on the data structure.
+With monoids there’s a general purpose function you’re probably going to want to use.
+And that function is called fold.
+</Text>
+        </Document>
+        <Document ID="71">
+            <Title>Dave</Title>
+            <Text>Overall, I think you need a hook for the talk. Focus the content around a single point more, with more consistency between examples. I've written a proposal for an alternate opening that'd give you an alternate spin but let you re-use a bunch of examples. See the bottom of this document.
+
+-----
+
+1:20
+
+Scala being complex is fair.
+There are too many damned features.
+The answer is to *not* use all the features.
+Choose a sane subset (or let us choose it for you).
+
+Or better still, don't talk about simplicity/complexity.
+
+5:15
+
+"We think" means "Underscore thinks".
+Do you need to make that clarification?
+
+Also, if you're only going to talk about two points,
+this list might be extraneous.
+
+Also, type classes are an exceptional example
+of types working for you. You should mention them.
+
+6:30
+
+Show of hands. Who knows these terms? Audiences like interaction.
+
+7:15
+
+Agreed with Miles -- avoid "mumbo jumbo".
+(I also didn't realise it had offensive undertones.)
+
+~8:00
+
+Describe what "sealed" and "final" do the first time you use them.
+
+10:00
+
+Coming back to the general thrust of the talk, I think the key point in all of this is that
+defining the types of data we're using up-front allows
+the compiler to do all sorts of crazy stuff for us.
+
+- Example 1 -- check exhaustivity of our pattern match;
+- Example 2 -- summon type class instances;
+- Example 3 -- shapeless magic woot!
+
+18:00
+
+That code looks super confusing if you don't know Scala syntax.
+Do it with round parens instead:
+
+for(v &lt;- List(1, 2, 3))
+  a = addition.combine(a, v)
+
+I'd just use built-in foldLeft in this example.
+People will understand it. Start with:
+
+  List(1, 2, 3).foldLeft(0)((a, b) =&gt; a + b)
+
+then go "we can write the same thing using our monoid":
+
+  List(1, 2, 3).foldLeft(addition.zero)(addition.combine)
+
+Then go "why do this?" and continue from 21:00 onwards.
+
+23:00
+
+It feels like your teetering on the edge of diving into this stuff. I'd get in and out faster (I assume you don't want to talk about it).
+
+"If we're building a set of all users for a large web site, we could very well run out of memory. Fortunately there are specialist data structures like HyperLogLog, that will give us an *approximate* user count and consume a relatively small, fixed amount of memory. The point here is that HyperLogLog sets are also monoids: we have everything we need with two operations: zero and combine."
+
+25:00
+
+IIRC you haven't mentioned string concatenation before... or at least in a while.
+
+29:00
+
+I think the laws will confuse people. Skip 'em.
+
+32:00
+
+(Note: I'm coming back to this now on Monday morning after our chat at the Skiff.)
+
+Can you maybe use CSV serialization as the running example to use to replace JSON writing? It's a "writer" style thing with monoidal combinators? Actually I think it's applicative, not monoidal ((F[A] F[B]) =&gt; F[(A, B)] instead of (A, A) =&gt; A) so maybe not. Dang.
+
+34:00
+
+Sized is a fairly complex example. Could you build the CSV library in section 2 in such a way that you can't get missing headers, and then re-use it in section 3?
+
+36:00
+
+The Circe partial updaters are an alternative to this... defined here:
+https://github.com/finagle/finch/blob/master/docs/best-practices.md#picking-a-json-library
+
+37:30
+
+The LoC in Bulletin is debatable. Without line wrapping it's, like, 35 lines of code... but some of them are REALLY LONG lines.
+
+38:30
+
+It's debatable whether you want this level of information (about HLists) in there. You can simply hand-wave this and say "the compiler can split User and UserUpdate into parts, check the types and field names, and make sure they all match up".
+
+43:00
+
+If you drop the focus on simplicity, some of your closing material will unfortunately have to go. But the stuff on Typelevel is still relevant.
+
+===== ALTERNATE OPENING =====
+
+- Types Working For You
+    - Part 0 - Introduction
+        - This talk is about types
+            - It's specifically about types in Scala
+            - It's more specifically about why types in Scala are so
+              freakin' cool, and why Scala developers get so excited
+              about them when everyone else sees them as a hinderance
+        - So what is a type?
+            - This intro to Typescript sums up a typical viewpoint:
+                - function greeter(person: string) {
+                      return "Hello, " + person;
+                  }
+
+                  var user = "Jane User";
+
+                  document.body.innerHTML = greeter(user);
+                    - A lot of people see types as error messages,
+                      designed to frustrate as much as to keep safe
+                      (picture of frustrated programmer)
+        - Seems like an unnecessary check, right?
+        - After all, what's so bad about this?
+            - document.body.innerHTML = greeter(12345);
+            - So we call the user by their primary key. Minor
+              information leak. Big deal. Why all the fuss?
+        - What about this?
+            - function shouldServeAlcohol(age) {
+                  if(person.age &gt; 18) {
+                      return false;
+                  } else {
+                      return true;
+                  }
+              }
+
+              serveAlcohol("17");
+        - It'll return true! We'll serve this person alcohol before
+          we're supposed to!
+        - Is this a bad mistake to make? Probably. Depends on your
+          viewpoint (i.e. are you the 17-year-old in question).
+        - What about this?
+            - function shouldLaunchNukes(sure) {
+                  if(sure) // etc ...
+              }
+
+              shouldLaunchNukes("false");
+        - (TODO: Example of writing a type definition as a line of
+          comment above every function.)
+        - In his famous talk "Simple Made Easy", Rich Hickey criticises
+          both types and unit tests by comparing them to guardrails
+          along a road:
+            - "Who drives their car around banging against the
+              guardrail saying, 'Whoa! I'm glad I've got these
+              guardrails because I'd never make it to the show on
+              time.'"
+        - Of course, this analogy is a joke. He's playing to the crowd.
+          But... he's utterly wrong, for a couple of reasons:
+            - First, types and tests aren't there to make development
+              faster. They're there to protect against catastrophic
+              failure:
+                - Types, specifically, provide universally quantified
+                  protection against whole classes of bugs.
+                    - In fact, if we use types correctly they can be
+                      less of a road and more of one of those
+                      old-fashioned vacuum tubes from supermarkets,
+                      that pulls us directly towards a working program
+                      with almost no capacity for errors.
+                    - (See Amanda's talk about Types Versus Tests from
+                      ScalaDays Amsterdam 2015. The idea of
+                      universal/existential quantification comes from
+                      there.)
+            - Second, there's a huge misconception here. Types aren't
+              just constraints. They're building blocks. They represent
+              facts about our code, that we can access and build upon
+              before we run our applications.
+                - In modern Scala, we've got to a stage where types are
+                  no longer guardrails.
+                - They're construction workers that build the road for
+                  us.
+        - So this talk is a Scala-specific look at types:
+            - I'll address the ways we can use types in a positive way
+              to guide our programming...
+            - ...and to guide the compiler to write code for us based
+              on rules we define.
+            - Finally, I'll look at modern Scala tooling that actually
+              breaks down our types for us, looking at their structure
+              and generating code based on their constituent parts.
+            - We're getting some of that "it just works" property of
+              dynamic languages, but without sacrificing that extra
+              barrier between us and catastrophic failure.
+    - Part 1 - Transportation with Types
+        - Let's move beyond the basic Typescript idea and see some
+          examples where types show us how to write the code
+        - EXAMPLES:
+            - Algebraic data types and structural recursion
+            - Person on web site. Sending email:
+                - (Describe person as visitor or registered user.)
+                - We want to write a method to send an email a person.
+                  Here's a code template:
+                    - def sendEmail(person: Person, text: String): Unit
+                      = ???
+                - This is the method header, but what does the actual
+                  code look like? I've used triple-question-mark here
+                  to denote code that we haven't written yet.
+                - Fortunately, the types tell us we know exactly what
+                  to write. There are two types of Person: LoggedIn
+                  users, who have an email address, and Visitors, who
+                  do not. We distinguish between these types using
+                  pattern matching:
+                    - def sendEmail(person: Person) = {
+                        person match {
+                          case Visitor(cookieId) =&gt; ???
+                          case LoggedIn(cookieId, email) =&gt; ???
+                        }
+                      }
+                - Once we've done our pattern matching, we have two
+                  places where we need to fill in the code.
+                  Fortunately, these are trivial. We know for a visitor
+                  that there's only one thing we can do: simply return.
+                    - def sendEmail(person: Person) = {
+                        person match {
+                          case Visitor(cookieId) =&gt; () // Do nothing
+                          case LoggedIn(cookieId, email) =&gt; ???
+                        }
+                      }
+                - For the logged in user, we have an email address so
+                  we can actually send the email:
+                    - def sendEmail(person: Person) = {
+                        person match {
+                          case Visitor(cookieId) =&gt; () // Do nothing
+                          case LoggedIn(cookieId, email) =&gt;
+                      actuallySendEmail(email)
+                        }
+                      }
+            - The Person simple example shows how types can be used to
+              guide our programming. We didn't know what to do with a
+              Person, so we pattern matched to get to cases where we
+              did know what to do. Let's look at another example...
+                - Linked lists are a ubiquitous data structure. There's
+                  a built-in linked list in Scala, but I'm going to
+                  invent my own here as an example.
+                - You'll be unsurprised to know that a linked list is
+                  an algebraic data type, just like Person:
+                    - sealed trait List[A]
+                      final case class Pair[A](head: A, tail: List[A])
+                      extends List[A]
+                      final case class Empty[A]() extends LinkedList[A]
+                - Let's consider the example of writing "map" for a
+                  linked list. Here's the method signature:
+                    - def map[A](list: List[A], func: A =&gt; B): List[B]
+                      = ???
+                - The map method takes as parameters a list of As and a
+                  function from A to B. Informally, its job is to apply
+                  the function to every A, turning it into a B, and
+                  accumulating a list of Bs.
+                - So what do we do in our example? It's not clear at
+                  the moment what code to write, so we'll do our
+                  structural recursion thing again and expand the code
+                  out with some pattern matching:
+                    - def map[A](list: List[A], func: A =&gt; B): List[B]
+                      = {
+                        case Pair(head, tail) =&gt; ???
+                        case Empty() =&gt; ???
+                      }
+                - And now, if we look at this like a logic puzzle, the
+                  solution becomes clear.
+                - We have access to a handful of variables of fixed
+                  types (head is an A, tail a list of A, and so on) and
+                  a handful of methods to combine them. In fact,
+                  there's only one way we can write this code to get it
+                  past the compiler.
+                - Let's look at the Empty() case first because it's
+                  simplest. We have an empty list of As and a function
+                  from A to B, and we have to build a list of Bs. We
+                  can't use the function because we have no As, so all
+                  we can do is construct an empty list of Bs:
+                    - def map[A](list: List[A], func: A =&gt; B): List[B]
+                      = {
+                        case Pair(head, tail) =&gt; ???
+                        case Empty() =&gt; Empty()
+                      }
+                - And in the pair case, we have the head--an A--and the
+                  tail-- a List[A]--and we need to build a List[B].
+                - We can build a List[B] in two ways: with the Empty()
+                  constructor (unlikely to be useful), or with the
+                  Pair() constructor, which needs a B and a List[B].
+                - We can turn the head into a B using func:
+                    - def map[A](list: List[A], func: A =&gt; B): List[B]
+                      = {
+                        case Pair(head, tail) =&gt; List(func(a), ???)
+                        case Empty() =&gt; Empty()
+                      }
+                - But how do we turn the tail into a List[B]? (Appeal
+                  to the audience.) Right---using map! So the solution
+                  is recursive:
+                    - def map[A](list: List[A], func: A =&gt; B): List[B]
+                      = {
+                        case Pair(head, tail) =&gt; Pair(func(a),
+                      map(tail, func))
+                        case Empty() =&gt; Empty()
+                      }
+                - So the point here is that we have a recursive
+                  algorithm that's fairly complex in comparison to most
+                  commercial programmers' day-to-day, but the types
+                  have done almost all of the work for us.
+                - The types are pulling us towards a solution, like the
+                  tube in the supermarket.
+        - So this is how types can document our code and guide us
+          towards the right solution. Rich Hickey called them
+          "guardrails" but I'm likening them to a vacuum tube.
+        - The examples I've used have been small and abstract, but
+          these patterns appear everywhere in functional programming.
+          Hopefully I've given the skeptical among you a little taste
+          of how Scala developers can use types to guide our code and
+          our way of thinking.
+            - In fact, there's a general rule of thumb that the more
+              abstract the types we have, the fewer ways there are of
+              combining them, and the easier it is to write the code.
+              This rule goes hand-in-hand with the idea of modularity,
+              where we're splitting our code into small problems and
+              solving each once and once only.
+    - Part 2 - Construction with Types
+        - But types can do lots more than this.
+    - Part 3 - Types as rocket fuel
+</Text>
+        </Document>
+        <Document ID="64">
+            <Title>Merge</Title>
+            <Text>It’s reasonably common to have to compare data structures in some way.  Merging database records with user data. And that can involve partial updates.
+
+For example, our user class from earlier.  Maybe we have these three fields: a database id, a name and an optional email address.
+
+And we get updates to this record across the web. I’m showing some kind of patch request here. Just the name is being sent. But you can imagine different ways a user is supplying just one thing to update. Especially with ajax based interfaces where updates are being fired at a server as soon as you move out of a field.
+
+Maybe what we want to do is represent an Update.  The id won’t update, but we might (optional) get an update to a name; and we might also get an email address update. Or possibly both.
+
+What we want to get to is: taking a user, taking an update, and merging them sensibly.  We preserve existing fields. We update fields we are told to update.
+
+Scala lets you do that, and check the fields all match up at compile time.  And it’s not for these specific classes: it’s can be done generically for any pair of classes. Without using run-time reflection or byte code hackery.
+
+ My colleague Dave Gurnell has put together a library, called bulletin. It’s  something like 60 lines of code.   But it’s using some pretty advanced features.
+
+And what does is provide a merge method, and this method type checks the fields of whateve case class it’s given: so user and the update in this case. And it’ll merge sensibly.  This is really doing two things for us:  it’s saving us from a lot of boring field-by-field comparisons, but it’s also helping us with code maintenance. If I make a change so the user and update classes mismatch in some way, we’ll get a compiler error.
+
+And it’s a much nicer compiler error. So for example, if I rename user’s name field to be family name, I’m told my user and update don’t match.
+
+If you’re wondering how it can do that, well there are a couple of things.  At the most abstract level, it’s turning the user class and updated class into a list of the types.  So user is a String for name, and optional string for email, and maybe there are other fields.  And update is really a list of an optional string for name, and optional optional string for email.
+
+And what happens is that the library splits this type apart into a head and the rest. And then the compiler has to go recursively figure out if the types match on the rest of the list of types. And this… if you recall… is the same pattern we used implementing fold.  Split a list into the head and rest, recurse on the rest.  Except in this case it’s happening at the type level, with the work being done by the compiler. 
+
+But it’a also able to do that because Scala supports features like type constraints, implicit methods, allows us to create a hetrogenous list
+
+So we need those features, but we don’t need them when we write this.
+</Text>
+        </Document>
+        <Document ID="57">
+            <Title>Atom</Title>
+            <Text>There’s a text editor called Atom.
+It’s a very nice open source editor from Github.
+
+And there’s a project called ENSIME which adds Scala support into various editors, including Atom.
+
+And I wanted to add a feature to it.  There’s a bar at the bottom of the editor.  Normally, it’s open and shows you details of compiler error and warnings. But when it’s closed like this, I want  to see me this summary of errors.
+
+In this project it’s telling me about 10 errors.
+
+To get that count, the way this works is … the file is sent across the network to an interface for the compiler, and it sends back various messages.  You don’t get  all the messages back in one go, they come back in a stream, which means you get answers quickly as they are found.  
+
+And sometimes you’ll get a message saying “ hold on, forgot those errors, I’ve found something else, and here are some other errors”
+
+Does this sound familiar?
+
+We have messages arriving that I want to combine into this summary.
+And we have a reset, that takes us back to no errors and no warnings.
+
+We can say: Its a monid. I know this!
+
+And what that means… well it means we know we need a zero and a way to combine two values, and there are laws to obey…
+
+But beyond that we also know what we’re going do with those messages…we’re going to fold over those messages.
+
+This recognition of a pattern guides our next steps at the keyboard. It means, as a developer, I can progress my work.
+I think that’s a big part of adopting some of the more functional ideas.
+
+And BTW, that was in CoffeeScript. The ideas in functional programming aren’t fixed on a particular language.
+
+</Text>
+        </Document>
+        <Document ID="72">
+            <Title>Miles</Title>
+            <Text>
+Try not to say "fuck ... that's not true, is it?" :wink:
+
+With my politically correct hat on, maybe avoid "mumbo jumbo".
+
+I'd be tempted to show ADTs as one liners if at all possible.
+
+Do you really want to introduce
+`
+Future
+`
+? That early?
+
+
+Maybe "sensible" should be "automatic"?
+
+I think in the bulletin example it seems like you're wavering between wanting to show the implementation and not wanting to. I'm not sure what I'd recommend here ... the implementation isn't easy to explain, but OTOH the use of
+`
+merge
+`
+is so simple it's easy to miss the point. (edited)
+
+
+So I think my main bit of feedback here is that you showed three fairly disconnected examples, monoid/fold, sized types, case class merge. I wonder if it might be better to find a single example that can be progressively refined, increasing generality and safety as you go.
+</Text>
+        </Document>
+        <Document ID="65">
+            <Title>Summary</Title>
+            <Text>
+The point here is to flag that the compiler can do more than maybe we usually let it do. And you may find situations where you benefit from that.
+
+In the case of that sized collection, we’re getting some compile-time assurances; in the case of the merging, we’re also saving ourselves a fair bit of code without resorting to run-time reflection.
+
+And if you decide to use libraries like this, or make use of the power features of Scala….
+
+</Text>
+        </Document>
+        <Document ID="58">
+            <Title>Thanks</Title>
+            <Text>Amanda
+Wesley
+Noel
+Dave
+Miles
+Jono
+Julio Capote
+Alessandro Zoffoli
+</Text>
+        </Document>
+        <Document ID="73">
+            <Title>Jono</Title>
+            <Text>- tweets 
+     - not so worried, but a nice to have permission
+
+ - Green on turquoise 
+     - hard to read?
+
+ - Algebraic data types 
+     - should it be Algebraic Data Types
+
+ - You don't mention what the pattern matching is structural recursion 
+   until much later in the talk
+
+ - is Mumbo Jumbo is PC term
+
+ - Vistor
+   - Anonymous &amp; User could|should be case objects 
+   - You said list of facts, the slide says set of facts,
+     causes brain fart ( there is a better technical term)
+   -
+
+ - monoid 
+   - visitor count 
+     - there will be a smart arse who says "why not use sum"
+     - possibly pass a list of people rather than ints 
+       - that is bad though, should be int or trait 
+     - distinct AND set are both functions on List 
+     - Love the explanation of the laws, nice and nice not scary.
+
+ taste of typelevel
+
+   - needs a little bit of a polish, although that maybe you 
+   questioning what to say.
+
+
+ loved the way you introduced and discussed typelevel.
+
+ count 
+   fuck  2
+   shit  1</Text>
+        </Document>
+        <Document ID="66">
+            <Title>Untitled</Title>
+        </Document>
+        <Document ID="59">
+            <Title>typelevel</Title>
+            <Text>On the cats side, I wonder if the general messaging (and in particular the word 'experimental' in the leader of it's homepage) slows adoption at all.
+
+ Almost no one is going to use an experimental library -- unless they have some tighter link to the project -- in a commercial setting. 
+
+I think 0.x implies experimental, but in a way more readily managed by software folk. That is, your manager is never going to understand the potential instability -- whereas they would understand (or perhaps misapprehend) what an experimental
+project is.
+
+React, for instance, is still 0.x and constantly changes it's internal APIs, but no one seems to be that worried about it.
+
+
+If it was me, I would attack it from a different angle: here is the stuff we can do today and here is the stuff coming up. If you need stuff in the coming up pile, maybe wait a bit.
+
+
+—
+
+I was also wondering if there would be standard learning path for some libries.
+
+E.g., to use Circ you need to know:
+[X] Typeclases
+[X] Reader Monoid
+…</Text>
+        </Document>
+        <Document ID="74">
+            <Title>Tuple Monoid?</Title>
+            <Text>o use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available:
+implicit def tupleMonoid[A : Monoid, B : Monoid]: Monoid[(A, B)] =
+   new Monoid[(A, B)] {
+     def combine(x: (A, B), y: (A, B)): (A, B) = {
+       val (xa, xb) = x
+       val (ya, yb) = y
+       (Monoid[A].combine(xa, ya), Monoid[B].combine(xb, yb))
+     }
+     def empty: (A, B) = (Monoid[A].empty, Monoid[B].empty)
+   }
+</Text>
+        </Document>
+        <Document ID="67">
+            <Title>Hold in my head</Title>
+            <Text>Sending email….
+
+Probably don’t have an address.
+
+In dynamic languages you maybe just given some chink of data, a map or something, and it’s easy to check to see if I have a map.
+But that’s extra stuff I have to hold in my head.
+</Text>
+        </Document>
+        <Document ID="3">
+            <Title>Untitled</Title>
+        </Document>
+        <Document ID="75">
+            <Title>ABSTRACT</Title>
+            <Text># Title
+
+Types working for you, not against you
+
+# Abstract
+
+There's a perception that Scala is too complicated.
+In part that may come from cryptic compiler errors and hard to understand types.
+You might be left wondering: what's the point?
+Why am I trying to hack my way through cruft?
+
+What I want to show is:
+
+1. There's a way of writing simple Scala.
+A few straightforward ideas can be used again and again.
+You using the power and flexibility of Scala, but in a sane way.
+This might not be the Scala you've heard about.
+
+2. The type system enables us to do more.
+It's not just about checking for errors.
+These ideas from the world of functional programming aren't about being "clever" (in the bad sense).
+It's about a useful set of tools for everyday coding.
+This might not be the functional programming you've heard about.
+
+The talk is in three parts:
+
+- an example of what Scala looks like when using pattern matching over classes;
+- how encoding an idea into types (using the "Combinable", or "monoid" if you like prefer that kind of word); and
+- using advanced features of Scala (compile-time sized checked collections) without having to complicate our own code.
+
+If you're Scala-curious,
+or heard that Scala or functional programming with types is just insanely complicated,
+this is the talk for you.
+
+
+# Bio
+
+- Richard Dallaway
+- @d6y
+- http://underscore.io
+- richard@underscore.io
+
+Richard is a partner at Underscore -- a consultancy specializing in Scala, especially the type-driven and functional aspects of Scala.
+He works on client projects writing software and helping teams deliver software with Scala.
+His focus is on the web, machine learning, and code review.
+He's the co-author of _Essential Slick_ (Underscore), and author of the _Lift Cookbook_ (O'Reilly).
+
+# Photo
+
+http://richard.dallaway.com/img/dallaway-uncropped.jpg
+
+</Text>
+        </Document>
+        <Document ID="4">
+            <Title>qcon</Title>
+        </Document>
+        <Document ID="68">
+            <Title>Notes from Dave</Title>
+        </Document>
+        <Document ID="5">
+            <Title>Welcome</Title>
+            <Synopsis>Motivation</Synopsis>
+        </Document>
+        <Document ID="69">
+            <Title>Feedback</Title>
+        </Document>
+        <Document ID="76">
+            <Title>NOTES</Title>
+            <Text>Qcon: what have I got? What do I need to get to? What functions are around to get me there,? Or do I need to write one? Spend a lot of time doing that.
+
+To make use of flatmap on future etc y have to start engaging Functional programming. (Opinionated).</Text>
+        </Document>
+        <Document ID="6">
+            <Title>This is a talk about Scala</Title>
+            <Synopsis>Me &amp; Scala</Synopsis>
+            <Text>Hi.
+Thanks for coming along to this session.
+My name is Richard, I work for a Scala consultancy called Underscore.
+
+This talk is about how types help us. 
+ and it’s in the context of the Scala.
+
+Scala’s been around 12 years.
+So no excuses: you must have seen it by now, tried it by now, or be using it already.
+
+I’m going to just remind you of some of the features,
+And point out how they let us use types to solve problems.
+
+
+Scala has a powerful modern type system. 
+ 
+But you might have heard the downside to that. 
+That idea that it’s complicated.
+</Text>
+        </Document>
+        <Document ID="7">
+            <Title>Ideas</Title>
+            <Text>We have these two themes.
+
+1. We'll be looking at straightforward development with Scala. 
+
+2. And the ideas of what types can really do for us. 
+
+It may seem there a little bit of tensions between these ideas.  But I see it as a progression.
+</Text>
+        </Document>
+        <Document ID="77">
+            <Title># Making Web Development Fun with Scala and Scala.js</Title>
+            <Text># Making Web Development Fun with Scala and Scala.js
+
+Scala is a statically typed object-functional language that compiles to Javascript and JVM bytecode. In this talk I'll show that Scala makes web development fast and fun.
+
+Scala has two things that are unfamiliar to many developers: it heavily emphasises functional programming (FP), and it has a modern static type system. 
+
+FP basics like first-class functions are becoming familiar to programmers from languages like Javascript and Java 8, but this is only scratching the surface of what makes FP interesting.
+
+ Most developers have some experience with simple type systems in languages like C, Java, or Go, where their main purpose is to tell the compiler about memory layout so it can generate fast code. 
+
+In modern type systems, like Scala's, we use types to represent program structure at an abstract level, and our own programs can make use of this information. 
+
+
+For example, we can use types to automatically generate serialisation code without the runtime cost and danger of reflection.
+
+In this talk I'll show how to build a questionnaire web service and front end in Scala, emphasising how Scala's unique features make the development process faster and more fun.</Text>
+        </Document>
+        <Document ID="10">
+            <Title>Power</Title>
+            <Text>If you're running a team, then you want them to have access to all the best power tools - there’s a lot of potential productivity there.  But you also want code that people want to work with, that no-one is alienated.
+
+What can we do about that?
+</Text>
+        </Document>
+        <Document ID="8">
+            <Title>Agenda</Title>
+            <Text>We'll deal with these ideas in three parts.
+
+I'll start with some Scala, looking at patterns for simple Scala.  We won’t spend too much time there.
+
+We'll move on from that and take a look at a really simple functional idea,
+encoding it as a type, and what it gets us.
+
+And in the final part I'll try to share an idea of how this progresses into typelevel programming, where the compiler is doings ome of our work for us.
+
+I’ll work through tree examples to try to make this as concrete as possible.
+My focus for all of this is application development. The examples come from that world.
+
+I’m presenting these as three distinct examples, although what we see in part 1, helps us in part 2; and what we see in part 2, helps us in part 3. 
+
+And at the heart of this is the idea of Scala as a scalable language, in the sense of it scaling with our needs.
+</Text>
+        </Document>
+        <Document ID="78">
+            <Title>Structure</Title>
+            <Text>One thing I love about this code, is the amount of structure I get.
+
+If I was working in a dynamic language, maybe JavaScript, perhaps I’d just have an object with some properties in it. Rather than match on an anonymous user, I could stick my hand in that bag and rummage around for some property that would tell me it’s an anonymous user.  That’s great, because I can throw in more properties without any ceremony.
+
+I could write an IF here… if my user object has an anonymous flag, then I do one thing, otherwise if they have some facts, do something else…  and superficially that wouldn’t look to different from this code. 
+
+But there’s a huge difference. Because I have this structure, I don’t have to hold that distinction between visitors in my head.
+
+I’m getting support from the types, and from the compiler, and that massively simplifies my job.
+</Text>
+        </Document>
+        <Document ID="9">
+            <Title>PART 1</Title>
+            <Synopsis>Straightforward Scala</Synopsis>
+        </Document>
+        <Document ID="11">
+            <Title>What can we do?</Title>
+            <Text>One thing is to be opinionated.
+
+Here are 6 core Scala features that we think are the ones you need to know for everyday programming.
+These are productive features.
+
+There are more things in Scala, but we don't use them very often.
+Other features are important for getting to the full power, but in an application… don’t use them so much.
+
+Some organizations  already are opinionated. They know what they like, and that’s what they use, and they have a way to introduce new ideas.
+For example, ING bank have training activities for engineers.  They’ve take education into their own hands, with class room activities, and sharing knowledge around.  And mostly they are taking their Java developers into Scala, starting with syntax, and then into functional programming concepts.  And that’s working for them for hundreds of developers.
+
+I don’t know if they use these 6 ideas or not, but these are the 6 we use.</Text>
+        </Document>
+        <Document ID="79">
+            <Title>Split</Title>
+            <Text>Notice, by the way, that m.empty is the only value we could have put in here. What we need to return is a T, and the only value we have of T in scope is empty.  So imagine, sitting in your editor.  And you’ve written up to here.
+
+What can you put in place of the blue question marks? You need the value T.   You’ve got an emty list, so that’s no help.  The only value you have is empty. 
+ Some languages can figure that out for you.  So Idris, for example, a totally different language, you could put your cusrsor after the arrow here, and hit ctrl alt S and it would solve the right hand side, and insert empty.  </Text>
+        </Document>
+        <Document ID="12">
+            <Title>Two</Title>
+            <Text>I've picked out these two to talk about,
+because I think it's maybe not a style much used in the Java world.
+
+So hopefully will give you an idea of what I mean by straightforward. So maybe it’ll give you something new to see.  
+
+But also these two are very common patterns we’re going to use throughout this talk. And I hope you’ll agree they lead to easily understood code, which means easy to maintain, also start to introduce types helping us.
+</Text>
+        </Document>
+        <Document ID="13">
+            <Title>ADT &amp; SR</Title>
+            <Text>These might be unfamiliar terms to some of you.
+
+Terminology can be daunting.
+Functional programming feels like it has a lot of terminology,
+but that's probably because functional programming are basically bandits, stealing all the good ideas from maths and logic.
+
+Most of the common terms are pretty easy to work through.
+
+I help run an functional programming meet up, and occasionally through some of these terms on a white board, unpick them, and see what they look like in different programming languages. You can get through four or so in an evening. It's good fun. You should try it.
+
+Anyway... these terms...
+
+They are handy labels, for amazingly useful idea.
+
+Algebraic data types is all about data.
+
+Structural recursion is about taking the data apart and doing something with it.
+
+Let's deal with the Algebraic data types first.
+
+This is all about modeling the world in terms of ANDs and ORs.
+
+For example: a visitor to your web site is anonymous or logged in.
+Notice the choice there. The or.
+
+On the other hand, a logged in user is made up of two things.
+an ID, and in the things we know about the user.
+Notice the AND.  
+
+There are just these two patterns to algebraic datatypes: and or also have names, and collectively they are known as algebraic data type.
+
+So what?
+This is kind of modeling leads to a clear style of development.
+Where the structure of the code we need to write, will follow the structure of the data.</Text>
+        </Document>
+        <Document ID="20">
+            <Title>Is that all you need to know?</Title>
+            <Text>That’s not all you need to know to programme Scala.
+
+Looking back at the example I showed, that was probably not how you serve adverts.
+At the very least, it'll be asynchronous.
+Or maybe you don’t always get an advert.
+Or maybe you asynchronously don’t always get an advert.
+
+You're not left stranded at this point.  You can use the pattern matching here.
+
+But, if this was a scala course of some kind, we’d be looking at sequencing computation next.  That’s map and flatMap operations.
+And that’s a super important thing to learn about… one of the 6 key things we think you need to know, espcially when you’re working with third party libraries.
+
+But this isn’t a course about Scala. So…. let's get out of the mechanisms of Scala, and talk about what else you get.
+
+Let's talk about types helping us out in other ways.
+
+</Text>
+        </Document>
+        <Document ID="21">
+            <Title>PART 2</Title>
+            <Synopsis>Types help us solve problems.</Synopsis>
+        </Document>
+        <Document ID="14">
+            <Title>Spec</Title>
+            <Text>So let's return to our specification.  A visitor is anonymous or logged in.
+
+In code that becomes a trait or abstract class.  And two sub types.  
+
+The sealed part means the compiler will check that there are no other kinds of visitors for us to deal with.
+Very handy as code evolves. If you introduce new types of visitor, the compiler will tell you if you've not handled them in the code base.
+
+So we’ve translated our visitor is two kinds of things into code.
+</Text>
+        </Document>
+        <Document ID="22">
+            <Title>Scenarios</Title>
+            <Text>
+To explain this, here are a list of things you might do when building an application.
+
+Typically you need to be able to combine things together.  
+Bring two lists together and squish them into one.
+Bring some statistics together and boil  them down to something.
+Gather messages and present them to a user.
+
+We can approach all of these problems in terms of two things.
+</Text>
+        </Document>
+        <Document ID="15">
+            <Title>Spec 2</Title>
+            <Text>The second part of the specification is that logged in user has and ID and facts. And we've thrown in here that an anonymous user has an id.
+Because we probably track them.
+
+Now our code goes from this, to this encoding where we have the ORs.
+You can still be anonymous or a user.
+but we've no encoded the ands: A user has an id and a list of facts about them.
+
+That's the data side of things.</Text>
+        </Document>
+        <Document ID="30">
+            <Title>Summary</Title>
+            <Text>We’ve looked at a very simple idea, and I’ve tried to give you an fel of how that actually helps us, in the real world, sitting at a keyboard.  Sorry, stand at a keyboard.
+
+There are many more ideas in functional programming.  And there are patterns and laws behind them, 
+
+But there’s only a handful that I find myself using
+
+Despite functional programming, types, and indeed maths, being a big area to explore.
+
+There’s another way that types can help us.
+</Text>
+        </Document>
+        <Document ID="23">
+            <Title>Combinable as a concept</Title>
+            <Text>And those two things are: a function for combining, and a value to represent nothing — the starting or empty value.
+
+What would that look like?
+
+If you want to sum numbers, the combiner is addition and the starting point is zero.
+
+If you want to combine text, you start with the empty string, and in Java and Scala use the + operator
+
+Note that we not doing the same thing in each case. But the structure of the problem is the same.  The fact that we use the + operation for numbers and the same symbol, +, for strings… that’s not relevant here.  That’s not the similarity.  The combine function can be kind of arbitrary, subject to some conditions we’ll get to.   The pattern is that there’s empty value and way to combine two values.
+
+Another example might help. If you have a set of things, you start with an empty set and union on to it.
+
+And I’ve worked with a web framework that let you build up JavaScript expressions: starting with nothing, it used the ampersand symbol as a way to combine JavaScript statements into JavaScript programs.
+
+The general pattern is is: for any type T, you need a zero for the T, and a way to bash two Ts together into one.
+
+</Text>
+        </Document>
+        <Document ID="16">
+            <Title>SR</Title>
+            <Text>Now we need to do something with that data.
+And that's the role of structure recursion.
+
+As an example, perhaps we need to serve a advert for a visitor.
+
+How to we implement this method?
+
+We don't have to think to hard. We've done the thinking part in setting up the data.
+We now need to deal with the two cases.
+
+And in Scala we can do that with pattern matching.  And don’t confuse that with regular expressions.  We’re matching on the types and the structure inside the types.</Text>
+        </Document>
+        <Document ID="31">
+            <Title>PART 3</Title>
+            <Synopsis>Libraries unlock power in a safe way, reduce repetition in your code. Level up by sharing what you know.</Synopsis>
+        </Document>
+        <Document ID="24">
+            <Title>Example: list of numbers</Title>
+            <Text>So what? We’ve given a name to a simple thing. How does that help us?
+
+Let’s work through some examples, starting simply and building up to something bigger.
+
+The boss says: those visitors we had, from earlier in the talk.  What’s the stats for the web site traffic? 
+
+If we know how many pages each visitor accessed, what’s the total?
+
+This is a trivial problem, right?
+You know how to solve using a loop, or a library function.
+You just have to add up the numbers.
+
+Let’s see what it looks like as a monoid instance.
+</Text>
+        </Document>
+        <Document ID="17">
+            <Title>serveAd</Title>
+            <Text>So we match on our visitor, and we know there are two cases to deal with.
+
+This is two patterns: the first is the case of a User, we don't care what their ID is, but we are going to use whatever info we have about them.
+
+The second pattern is the anonymous user case, and here we are picking up whatever id they have.
+
+And we can produce some advert however we want. In the case of the user, maybe we find a relevant ad.
+For an anonymous user, maybe we rotate based on their cookie id.
+
+For the logged in user, we can use what we know about them — their interests or preferences — to serve up something useful.
+
+And one thing to note here: these two methods -- relvantads and rotatedads - don't need to know anything about users.
+They can we written in isolation from users, and just work on the data they need to work on.
+</Text>
+        </Document>
+        <Document ID="32">
+            <Title>Sized</Title>
+            <Text>Instead what we can do is ask the compiler to check the lengths match up.
+
+Here’s my CSV method.  And as you’d expect the first argument is a list of strings, and the second argument is a list of rows, and each row is a list of strings.
+
+The length of each row should match the length of the header.
+The surprising thing is that this is possible with Scala.  And it’s possible because of some features that are called out as being complex, or undesirable. 
+
+But we we can benefit from those features via a library.  
+
+So in this case we can make use of a library, a library called shapeless.
+
+The change to the code … is something you’d take from the documentation.  It puts a type parameter on csv, N, which had better be a natural number.  Because we’re going to be counting something.
+
+And then our header and rows are wrapped in a Sized type, both of which share this N.  In other words, the compiler is going to have to be happy that headers and rows both have this same N.  The same length.
+
+
+When we call CSV, we need a Sized collection, which we get from a constructor.  So Sized Date there is constructing a List with a Size, or N of 1.
+And because that doesn’t match the length of my rows, it will be a compiler error.
+
+I’m not showing you this to say: wow, go use this in your code. I’m showing it because it maybe a surprise that the Scala compiler can do these kinds of tricks.  These kinds of things open my mind to the idea that maybe I can push more work down on the compiler.
+
+You may find you have practical occasion  to use this, but it’s really only viable for small lists, and although this does produce a compiler error, it’s a whopper.  And although the information is there… it’s exposing a lot of how the library is working.  
+
+The error follows the normal conventions. It’s saying there’s a type error. It found a size of natural number 1, but required a successor of 1 (or 2 as we often call it).  And it tells you where it happened, but … not a lot of fun wading through those.
+
+But… what do you prefer: the compiler catching errors, or having runtime errors?
+
+Let’s look at another example.
+One which is more useful and practical.
+
+And one that has much better error messages, but is in the same area as capturing things at compile time.
+</Text>
+        </Document>
+        <Document ID="25">
+            <Title>What is fold</Title>
+            <Text>Keeping with the theme of simplicity, we can write a fold function.
+
+This is a version that’s hard coded for addition. We will generalize it in a moment.
+
+We have values in a list.
+What we do here is match on our list of values,
+And in the case of an empty list, Nil, the value to return is the empty value.
+If, on the other hand, our list is made up of a value and the rest of the list, our result is that value and whatever we get from folding on the rest of the list.  So it’s a recursive algorithm.
+
+Folding on list 1,2,3, will give us an answer of 6
+
+Visually we can see that happening.  Starting with a list of three values, we pick off the first value.
+We add to that the result of folding the rest of the list.
+We repeat the process.
+And eventually we run out of values, so we use zero, and combine all those steps up. And they add up to 6.
+
+</Text>
+        </Document>
+        <Document ID="18">
+            <Title>Summary</Title>
+            <Text>That kind of code, is pretty straightforward. You can be productive, and it occurs frequently, including in the standard library.
+
+You have to decide to write code that way. You have to be opinionated in what you use, and that’s how you avoid opening the code and saying “what the hell is that”.
+
+
+And we started to see how types start to help us, by having some structure to work with, but let’s look at other ways they help.</Text>
+        </Document>
+        <Document ID="40">
+            <Title>Positive</Title>
+            <Text>You'll see people talking development in terms like this.  
+This idea of writing down a type signature, and following the type to an implementation.
+That sounds almost mystical.
+
+“Follow the types”
+
+This is definitely something I identify with.
+
+And I want to get across the idea of why we bother, what the pay off is, for using types.
+
+</Text>
+        </Document>
+        <Document ID="26">
+            <Title>Generalizing</Title>
+            <Text>That’s OK, but hard coded.  To generalize it we can drop in our monoid class.  That’s a parameter to fold, and we replace our hard coded values with empty and combine.
+
+
+But we can go more general.
+
+If we remove mention of Int, and say for some type T…. If we have a list of T and a monoid for those Ts, then… nothing else changes in the implementation.
+
+</Text>
+        </Document>
+        <Document ID="19">
+            <Title>Is that complex?</Title>
+            <Text>In some ways what I've shown you is trivial.
+And yet if people think Scala is complex, we need to remember that we can use the straghtforward parts.
+
+And this isn’t stuff you use only in your first week of Scala. 
+Very often when I sit down to write code, I’m starting with the data types: what are the options I need in terms of ORs, What fields or ANDs those classes need. And from that, go on to build out an applciation.  
+
+</Text>
+        </Document>
+        <Document ID="33">
+            <Title>bulletin</Title>
+            <Text>- depending on running length:
+- https://github.com/davegurnell/bulletin</Text>
+        </Document>
+        <Document ID="41">
+            <Title>Why? - Go</Title>
+            <Text>Let’s get going.
+
+But Scala is an un-opinionated language, and that can lead to some tricky situations. and developers taking different routes through the features on offer.
+
+There was a post at the end of last year about a team, they were debugging a production problem…
+
+And they only had one issues: they had no idea what the code was doing.
+
+They came across a strange symbol.  Which they called the starship operator.
+
+Someone said out loud “what the hell is that?”.
+
+And I think that's probably a fair reaction.  And an unhappy position to be in.
+
+We could shrug this off and say it’s a team issue... why is that getting into production, where's the review...
+those are important and valid points, but the issue being made in this article is someone can write some Scala that the rest of the team didn't understand. 
+
+That’s not what we want. What we all want is... and what the post goes on to say is...
+
+It's about having a maintainable code base where you can have people cross projects easily and get new hires up to speed rapidly.
+
+We all want that.
+
+</Text>
+        </Document>
+        <Document ID="27">
+            <Title>Benefits</Title>
+            <Text>Here are the main three benefits I see from us thinking in terms of monoids.
+
+We get flexibility, we get to re-use monoids as they compose, and we get help problem solving.
+
+Now composition, isn’t something I’m going to talk about. The idea is broadly that you can use monoids as building blocks to get monoids for more complicated structures.
+
+I want to focus on these other two.
+</Text>
+        </Document>
+        <Document ID="34">
+            <Title>Summary</Title>
+            <Text>- there's much power in Scala
+- the fiddly bits are off behind flags anyway to stop you cutting off your own fingers
+- if you want to know it, there's an open and welcoming community...
+
+---</Text>
+        </Document>
+        <Document ID="42">
+            <Title>A taste of typelevel</Title>
+            <Text>Even though we’re using straightforward parts of Scala, and only looked at a very simple type.
+
+We’ve not used any exotic features, but we’re also not excluded from using other parts of Scala when we need them.
+
+In this last section I want to give you a taste of what that could be.  And how the compiler can do some of our work for us.
+
+I have two example to share.  The first is to illustrate that we can push things we might usually view as runtime concerns down to the the compiler.  And anytime we do that, the benefit is catching a problem when you press save in your editor,  rather than when you run the code.
+
+And we can write simple methods that take a list of headers, and a list of rows.  And somehow turn that into CSV.
+One thing that can go wrong is we don’t have the right headers.  Code changes over time, new fields get added to a report, and the column headers sometimes go missing. It’s not the end of the world, not a huge deal.
+
+What can we do to prevent that?
+We can write a unit tests: good idea, nothing wrong with doing that. 
+We can add a check inside our csv method:  some kind of assertion that headers and the rows should be the same length.
+But that’s not great as it’ll give us an error at runtime.  At least with our bug, we get a report at runtime.
+</Text>
+        </Document>
+        <Document ID="35">
+            <Title>Summary</Title>
+            <Synopsis>Take home points: be opinionated; types help you progress implementation; lots of power when you need it.</Synopsis>
+        </Document>
+        <Document ID="28">
+            <Title>Parallel laws</Title>
+            <Text>What other flexibility do we get? We can safely apply our monoid in parallel.
+
+Our counting or hyperloglog-ing, or looking for distinct visitors can all be safely split up into multiple jobs, and combined back into a single value.  And we know that because of laws.
+
+This is something else that functional programming has done for us. To be a monoid you have to have the structure I mentioned, but you also need to follow the monoid laws. And there are two laws.  And the laws are really what make something a monid, I guess.
+
+The laws look like this.  For our addition monid we demand that applying empty to a value has no effect. And when adding, we demand that it doesn’t matter how to group those operations.  So 1 plus 2, when added to three, is the same as 1 added to the combined 2 and 3.
+
+The same must apply for our string concatination monoid.  Here our empty value is the empty string.   
+
+And this has to hold for any values. So any a plus the empty value is a.  Any a plus b, then plus is c….
+
+The’s laws have names:  identity and associativity
+And more generally, in the language of the interface I’ve been using we say: a combined with empty is a, and a combined with b combined with c, is the same as….well, you get the idea.   
+
+There’s no police enforcing that law. Typically, when you write an instance, you’re write a test to go with it. Usually you’ll do that with property based-testing, where you use a library that will generate edge cases and arbitrary values, and test your monoid.
+
+And I think you can see that providing we obey those laws, our monoid - regardless of what it does — will parallelize nicely.  It doesn’t matter if you do this in one thread of execution or many, you’re going to get the same answer. And that’s possible because the law of the data structure.
+</Text>
+        </Document>
+        <Document ID="50">
+            <Title>cats docs</Title>
+            <Text># What is a Semigroup?
+
+A *semigroup* is a tool for combining values. Many different types have a natural "addition" operator: integers can be added, strings can be appended, sets can be unioned, and so on. Semigroups provide a unified way of performing these operations. Here are some examples:
+
+~~~ scala
+import cats._
+import cats.std.all._
+~~~
+
+Let's start by adding some integers. We'll summon the `Semigroup` for `Int` and use it to combine a couple of integers:
+
+~~~ scala
+val intSemigroup = Semigroup[Int]
+val intResult = intSemigroup.combine(1, 2)
+~~~
+
+As we can see, the `combine` method on the `Semigroup` is implemented as an integer addition. This isn't the only way of combining integers, but it seems like a sensible default. How about some `Strings`?
+
+~~~ scala
+val stringSemigroup = Semigroup[String]
+val stringResult = stringSemigroup.combine("1", "2")
+~~~
+
+The `combine` operation for `Strings` is string append. Again, this seems like a sensible default. Summoning `Semigroups` manually like this is a bit verbose, though. Fortunately, Cats provides some nice "syntax" for combining values in the form of the `|+|` operator:
+
+~~~ scala
+1 |+| 2
+"1" |+| "2"
+~~~
+
+`|+|` automatically summons the relevant semigroup for us implicitly so we don't have to look it up ourselves.
+
+Ok. So we can combine `Ints` and `Strings` using the same generic operator. What does this get us? Not a lot apparently---Scala already lets us add `Ints` and `Strings` using the regular `+` operator. However, Cats goes further than this. For example, can also append `Lists` and union `Sets` using `|+|`:
+
+~~~ scala
+List(1, 2) |+| List(3, 4)
+Set(1, 2) |+| Set(3, 4)
+~~~
+
+We can even merge `Maps` provided Cats knows how to merge their keys:
+
+~~~ scala
+Map("a" -&gt; 1, "b" -&gt; 2) |+| Map("b" -&gt; 3, "c" -&gt; 4)
+Map(1 -&gt; "a", 2 -&gt; "b") |+| Map(2 -&gt; "c", 3 -&gt; "d")
+~~~
+
+This last case is interesting because it shows the power of type classes and implicit resolution. Cats' provides a semigroup for `Maps` that merges their keys. Where keys conflict, the semigroup needs to merge the values. How does it merge the values? It uses a semigroup! In other words, Cats can provide us with a semigroup for any `Map[A, B]` provided it can also provide a semigroup for `B`. Here's another example:
+
+~~~ scala
+val m1 = Map("a" -&gt; List(1, 2, 3), "b" -&gt; List(4, 5, 6))
+val m2 = Map("b" -&gt; List(7, 8),    "c" -&gt; List(9, 0))
+m1 |+| m2
+~~~
+
+# Why is a semigroup useful?
+
+Like many of Cats' type classes, we can use semigroups in three ways:
+
+1. We can either code that is generic across "combinable" data types. For example, here is a method that can combine the items in any non-empty `List[A]` provided we can summon a `Semigroup` for `A`:
+
+   ~~~ scala
+   def combineListItems[A](list: List[A])(implicit semigroup: Semigroup[A]): A =
+     list.reduceLeft(_ |+| _)
+
+   combineListItems(List(1, 2, 3))
+   combineListItems(List("1", "2", "3"))
+   ~~~
+
+2. We can implement semigroups for our own data types, allowing us to combine them using `|+|`. For example, here is a semigroup that can combine any tuple `(A, B)` provided we know how to combine values of types `A` and `B`:
+
+   ~~~ scala
+   implicit def tupleMonoid[A, B](implicit semiA: Semigroup[A], semiB: Semigroup[B]): Semigroup[(A, B)] =
+     new Semigroup[(A, B)] {
+       def combine(x: (A, B), y: (A, B)): (A, B) = {
+         val (xa, xb) = x
+         val (ya, yb) = y
+         (xa |+| ya, xb |+| yb)
+       }
+     }
+   ~~~
+
+3. Cats provides higher-level methods that use semigroups to provide more advanced generic operations on our data. Here's a simple example---the `combineN` method combines an element with itself *n* times:
+
+   ~~~ scala
+   5 combineN 3
+   "5" combineN 3
+   List(1, 2, 3) combineN 3
+   ~~~
+
+   We'll see much more compelling examples of high-level operations in the next section.
+
+# What is a Monoid?
+
+Being able to combine elements using a semigroup is undoubtedly useful. However, we are slightly restricted in that we need two elements of a given type before we can combine them. Monoids extend semigroups by providing a "zero" element that allows us to fold over collections and much, much more.
+
+A `Monoid` is, very simply, a `Semigroup` that provides one extra method called `zero`:
+
+~~~ scala
+val intMonoid = Monoid[Int]
+
+intMonoid.combine(1, 2)
+
+intMonoid.zero
+~~~
+
+~~~ scala
+val setMonoid = Monoid[Set[String]]
+
+setMonoid.combine(Set("a", "b"), Set("b", "c"))
+
+setMonoid.zero
+~~~
+
+Monoids can do everything that semigroups can do, so all of the examples above work just as well. In addition, they allow us to write more powerful generic methods. For example, we can now rewrite our `combineListItems` method to work with empty lists as well as non-empty ones:
+
+~~~ scala
+def combineListItems[A](list: List[A])(implicit monoid: Monoid[A]): A =
+ list.foldLeft(monoid.zero)(_ |+| _)
+
+combineListItems(List(1, 2, 3))
+combineListItems(List("1", "2", "3"))
+combineListItems(List.empty[Int])
+combineListItems(List.empty[String])
+~~~
+
+We also have access to lots more high-level functionality from Cats. For example, Cats provides a `Foldable` type class:
+
+~~~ scala
+val listFoldable = Foldable[List]
+~~~
+
+`Foldable` provides numerous methods for folding over collections. One such method is `foldMap`, which maps a function over a collection and reduces all the items using a `Monoid`:
+
+~~~ scala
+listFoldable.foldMap(List(1, 2, 3))(_.toString)
+~~~
+
+`foldMap` is also available as syntax, so we can write it infix as if it was a method defined directly on `List`:
+
+~~~ scala
+List(1, 2, 3).foldMap(_.toString)
+~~~
+
+Lots of power is emerging here. We can now write generic code to fold over arbitrary collections producing results of arbitrary types. All we need is a `Foldable` and a `Monoid` of the right type:
+
+~~~ scala
+// TODO: Example
+~~~
+</Text>
+        </Document>
+        <Document ID="43">
+            <Title>Branches make bugs</Title>
+        </Document>
+        <Document ID="36">
+            <Title>Keypoints</Title>
+            <Text>What have we seen?
+
+We started with some very straightforward scala code. That’s a style of code I use a lot, starting with writing down the types, and figuring out how I want to operate with them.  There was nothing complicated there. The take away point: is have an opinion on what you use from the language.
+
+We took a look at a very simple functional programming idea, the monoid. What I’d like you to remember from that the ideas from functional programming help as your solving problems.  They’re not fancy ideas for annoying people with.
+
+And finally, we took a brief look at some of the power features that Scala has. And you can ignore them, or start to dip into them as you need. If you’re doing that, please make sure you share the learning around your team.  That won’t happen unless you create an environment for your team to share knowledge around.
+
+On the first part, the straightforward part, the picture is set to get better.  At the start of this year, Martin Odersky the father of Scala, set out his agenda to make the Scala simpler.
+
+And on the second part, when it comes to making use of types, well I was using a library for that from a community called typelevel scala, which you can find here at typelevel.org.  Theres a bunch of libraries there from foundational functional programming, to numerics things, and database libraries….many libraries.  But what’s good for us in particular is the focus on:
+
+Functional Programming in Scala - not Scala  trying to be another language like Java or Haskell, but using functional programming with Scala in idiomatic way.
+And also making available learning resources, to make the ideas more accessible.
+
+Both of those are goals. They are not done yet, but that’s I think is the right direction to be going in.  And I suggest you get involved in, try things, jump on gitter and ask questions.
+
+Remember: Scala scales with the team, use the parts you want, you don’t have to rush in and use it all.  And make use of those type ideas from functional programming. They are there to help you. And share what you learn.
+</Text>
+        </Document>
+        <Document ID="29">
+            <Title>CRDT example</Title>
+            <Text>- if needed, depending on timing.</Text>
+        </Document>
+        <Document ID="51">
+            <Title>Convention over configeration</Title>
+            <Text>Convention over configuration
+</Text>
+        </Document>
+        <Document ID="37">
+            <Title>Thanks</Title>
+            <Text>Amanda
+Wesley
+Noel
+Dave
+Miles
+Jono
+Julio Capote
+Alessandro Zoffoli
+</Text>
+        </Document>
+        <Document ID="44">
+            <Title>Monoid laws</Title>
+        </Document>
+        <Document ID="45">
+            <Title>Set up</Title>
+            <Text>What do I mean by helping?
+
+When I’m writing software, I want to make some progress.
+And the recognition of a type can help me do that.
+And when I see the idea, or type, I can automatically - almost mechanically - know what to do with that type.
+
+In other words, it’ll help me get on with my job.
+
+That’s the kind of help I mean.
+</Text>
+        </Document>
+        <Document ID="38">
+            <Title>Idea 2</Title>
+            <Text>2. And we'll be looking at types helping us.
+And by that I mean more than just the compiler saying: hey you put a string here but you should have used a double.
+I mean enabling us to go beyond that. And that's where some of the power of Scala comes into it,
+and yes, if you push it hard enough, some of the code gets hairy, but not in our application.
+
+And part of the idea here is that Scala is a scalable language.  
+Asde from the horizontal and vertical and multicore use of scalable,
+we mean scalable in it growing with your team.
+
+Typelevel: you're not relying on one person in your team who knows the weird stuff.
+
+
+
+
+
+Third Way
+
+- Scala as a better Java
+- Scala because I'm not allowed to use Haskell
+
+
+
+ There was some other implicit magic going on that wasn’t immediately apparent"</Text>
+        </Document>
+        <Document ID="52">
+            <Title>Why bother?</Title>
+            <Text>Well… I’ve not helped us much yet.
+
+
+</Text>
+        </Document>
+        <Document ID="46">
+            <Title>Examples</Title>
+        </Document>
+        <Document ID="60">
+            <Title>CAN WE GIVE ANOTHER EXAMPLE HERE?</Title>
+            <Text>[Something to build on that, and emphasis the following-the-types?]</Text>
+        </Document>
+        <Document ID="53">
+            <Title>Do we like this code?</Title>
+            <Text>Although we’ve got to something more general, that’s an illustration.  I’d probably use an existing library for this that typically is still more general, not requiring a list either.  The same idea can be used to “fold over” a vector, or a map, or a tree. And would be more efficient, and at least do tail recursive.
+
+But the basic idea is this, and I wanted to show that it isn’t a complicated idea 
+
+
+
+So what… we have a name for something simple, a monoid, and we can operate on it with a fold.
+
+Sure, we can respond to the bosses request with a little bit of code.
+
+That’s not the benefit.  We would have written that a bunch if ways.
+So let’s look at the benefits of why we might follow this route.
+</Text>
+        </Document>
+    </Documents>
+</SearchIndexes>
